@@ -1,0 +1,6 @@
+[submodule "text-model"]
+	path = text-model
+	url = https://github.com/MuChengTeam/TextModel
+[submodule "text-model-android"]
+	path = text-model-android
+	url = https://github.com/MuChengTeam/TextModel-Android

@@ -1,0 +1,43 @@
+<resources xmlns:tools="http://schemas.android.com/tools">
+
+    <!-- Base application theme. -->
+    <style name="Theme.WebDev" parent="Theme.MaterialComponents.DayNight.NoActionBar">
+        <!-- Primary brand color. -->
+        <item name="colorPrimary">@color/purple_500</item>
+        <item name="colorPrimaryVariant">@color/purple_700</item>
+        <item name="colorOnPrimary">@color/white</item>
+        <!-- Secondary brand color. -->
+        <item name="colorSecondary">@color/purple_700</item>
+        <item name="colorSecondaryVariant">@color/teal_700</item>
+        <item name="colorOnSecondary">@color/black</item>
+        <item name="android:statusBarColor">@color/white</item>
+        <item name="android:forceDarkAllowed" tools:targetApi="q">false</item>
+        <!-- Customize your theme here. -->
+    </style>
+
+    <style name="AnimationPopupWindow" parent="Theme.WebDev">
+        <item name="android:windowEnterAnimation">@anim/nav_default_enter_anim</item>
+        <item name="android:windowExitAnimation">@anim/nav_default_exit_anim</item>
+    </style>
+
+    <style name="InputStyle" parent="Widget.AppCompat.EditText">
+        <item name="android:background">@drawable/drawable_input_style_light</item>
+        <item name="android:minHeight">40dp</item>
+        <item name="android:textSize">14sp</item>
+    </style>
+
+    <style name="ButtonStyle" parent="Widget.MaterialComponents.CardView">
+        <item name="android:focusable">true</item>
+        <item name="android:clickable">true</item>
+        <item name="android:padding">10dp</item>
+        <item name="cardBackgroundColor">@color/special</item>
+        <item name="cardCornerRadius">12dp</item>
+        <item name="android:minHeight">40dp</item>
+        <item name="cardElevation">0dp</item>
+    </style>
+
+    <style name="TabLayoutTextStyle">
+        <item name="textAllCaps">false</item>
+    </style>
+
+</resources>

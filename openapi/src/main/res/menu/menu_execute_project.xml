@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools">
+
+    <item
+        android:id="@+id/undo"
+        android:icon="@drawable/ic_left"
+        android:title="撤销"
+        app:showAsAction="always"
+        tools:ignore="AlwaysShowAction,HardcodedText" />
+
+    <item
+        android:id="@+id/redo"
+        android:icon="@drawable/ic_right"
+        android:title="恢复"
+        app:showAsAction="always"
+        tools:ignore="AlwaysShowAction,HardcodedText" />
+
+    <item
+        android:id="@+id/reload"
+        android:icon="@drawable/ic_reload"
+        android:title="重载"
+        app:showAsAction="always"
+        tools:ignore="AlwaysShowAction,HardcodedText" />
+
+    <item
+        android:icon="@drawable/ic_more"
+        android:title="更多"
+        app:showAsAction="always"
+        tools:ignore="AlwaysShowAction,HardcodedText">
+
+        <menu>
+
+            <item
+                android:id="@+id/copyLink"
+                android:title="复制本地链接"
+                app:showAsAction="never"
+                tools:ignore="AlwaysShowAction,HardcodedText" />
+
+            <item
+                android:id="@+id/copyPrivateLink"
+                android:title="复制局域网链接"
+                app:showAsAction="never" />
+
+        </menu>
+
+    </item>
+
+</menu>

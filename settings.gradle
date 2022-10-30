@@ -1,0 +1,29 @@
+pluginManagement {
+    repositories {
+        gradlePluginPortal()
+        google()
+        mavenCentral()
+    }
+}
+dependencyResolutionManagement {
+    repositoriesMode.set(RepositoriesMode.FAIL_ON_PROJECT_REPOS)
+    repositories {
+        google()
+        mavenCentral()
+        maven { url "https://jitpack.io" }
+        maven { url "https://plugins.gradle.org/m2/" }
+    }
+}
+rootProject.name = "WebDev"
+include ':app'
+include ':easy-animation'
+include ':plugin'
+include ':plugin-static-project'
+include ':openapi'
+include ':editor'
+include ':text-model'
+include ':language'
+include ':annotation-mark'
+include ':plugin-lmmp-project'
+include ':plugin-httpd-project'
+include ':text-model-android'

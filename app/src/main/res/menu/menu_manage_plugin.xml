@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools">
+
+    <item
+        android:id="@+id/deletePlugin"
+        android:title="删除插件"
+        tools:ignore="HardcodedText" />
+
+    <item
+        android:id="@+id/pluginSetting"
+        android:title="插件配置"
+        tools:ignore="HardcodedText" />
+
+</menu>

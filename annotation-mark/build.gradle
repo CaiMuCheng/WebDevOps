@@ -1,0 +1,68 @@
+/*
+ * Project: 沐盒
+ * Author: 苏沐橙
+ * GitHub: https://github.com/CaiMuCheng
+ * QQ: 3578557729
+ * Email: 3578557729@qq.com
+ * Copyright © 2022 - 2022 SuMuCheng
+ *
+ * 本项目使用 MPL 2.0 协议开源，你不得做出任何侵权行为
+ * 若需要集成此项目，请保留协议并标注作者信息
+ * 如果你的项目是 Android 项目，请在关于中引用此项目
+ * 若你不遵顼以上条例，我们将向起诉你
+ *
+ * This project is open sourced under the MPL 2.0 protocol, and you are not allowed to do any infringements.
+ * If you need to integrate this project, please keep the agreement and mark the author information.
+ * If your project is an Android project, please reference this project in About.
+ * If you do not comply with the above regulations, we will sue you.
+ */
+
+plugins {
+    id 'com.android.library'
+    id 'org.jetbrains.kotlin.android'
+}
+
+android {
+    compileSdk 32
+
+    defaultConfig {
+        minSdk 21
+        targetSdk 32
+
+        testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
+        consumerProguardFiles "consumer-rules.pro"
+    }
+
+    buildTypes {
+        release {
+            minifyEnabled false
+            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+        }
+    }
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_1_8
+        targetCompatibility JavaVersion.VERSION_1_8
+    }
+    kotlinOptions {
+        jvmTarget = '1.8'
+    }
+}
+
+dependencies {
+
+    // Material 3 Libs
+    implementation 'androidx.core:core-ktx:1.7.0'
+    implementation 'androidx.appcompat:appcompat:1.3.1'
+    implementation 'com.google.android.material:material:1.5.0-alpha04'
+    implementation 'androidx.constraintlayout:constraintlayout:2.0.4'
+    implementation 'androidx.navigation:navigation-fragment-ktx:2.3.5'
+    implementation 'androidx.navigation:navigation-ui-ktx:2.3.5'
+
+    // Kotlin Coroutine Libs
+    implementation 'org.jetbrains.kotlinx:kotlinx-coroutines-android:1.6.4'
+
+    // Unit Test Libs
+    testImplementation 'junit:junit:4.13.2'
+    androidTestImplementation 'androidx.test.ext:junit:1.1.3'
+    androidTestImplementation 'androidx.test.espresso:espresso-core:3.4.0'
+}

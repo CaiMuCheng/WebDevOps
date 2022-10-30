@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.appcompat.widget.LinearLayoutCompat xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_margin="15dp"
+    android:orientation="vertical"
+    android:focusable="true"
+    android:clickable="true">
+
+    <com.mucheng.web.devops.ui.view.MaterialTextViewX
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="WebDevOps"
+        android:textColor="?attr/colorOnSurface"
+        android:textSize="18sp"
+        tools:ignore="HardcodedText" />
+
+    <com.mucheng.web.devops.ui.view.MaterialTextViewX
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="5dp"
+        android:text="Design by SuMuCheng"
+        android:textColor="?attr/colorOnSurface"
+        android:textSize="18sp"
+        tools:ignore="HardcodedText" />
+
+</androidx.appcompat.widget.LinearLayoutCompat>
