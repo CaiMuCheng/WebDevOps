@@ -11,8 +11,8 @@ android {
         minSdk 21
         //noinspection ExpiredTargetSdkVersion
         targetSdk 28
-        versionCode 12
-        versionName "2.0.6.0"
+        versionCode 15
+        versionName "2.0.8.0"
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
     }
@@ -27,19 +27,17 @@ android {
         enabled true
     }
     compileOptions {
-        sourceCompatibility JavaVersion.VERSION_1_8
-        targetCompatibility JavaVersion.VERSION_1_8
+        sourceCompatibility JavaVersion.VERSION_11
+        targetCompatibility JavaVersion.VERSION_11
     }
     kotlinOptions {
-        jvmTarget = '1.8'
+        jvmTarget = '11'
     }
 }
 
 dependencies {
-    implementation project(path: ':easy-animation')
     implementation project(path: ':plugin')
     implementation project(path: ':openapi')
-    implementation project(path: ':text-model')
 
     def lifecycle_version = "2.6.0-alpha01"
     def nav_version = "2.5.1"
@@ -68,6 +66,10 @@ dependencies {
 
     // Kotlin Reflect Lib
     implementation "org.jetbrains.kotlin:kotlin-reflect:1.7.10"
+
+    implementation(platform("io.github.Rosemoe.sora-editor:bom:0.20.4"))
+    implementation "io.github.Rosemoe.sora-editor:editor"
+    implementation "io.github.Rosemoe.sora-editor:language-textmate"
 
     // Refresh Lib
     implementation "androidx.swiperefreshlayout:swiperefreshlayout:1.1.0"

@@ -32,8 +32,6 @@ val OutCacheDir: File = File("$MainDir/cache")
 
 val GlobalConfigFile: File = File("$ConfigDir/GlobalConfig.xml")
 
-val EditorTypefaceFile: File = File("$TypefaceDir/RecMonoLinear-Regular.ttf")
-
 @Suppress("SpellCheckingInspection")
 private val NomediaFile: File = File("$MainDir/.nomedia")
 
@@ -55,7 +53,6 @@ fun AppCompatActivity.CreateCoreFiles() {
 
     runCatching {
         GlobalConfigFile.createNewFile()
-        EditorTypefaceFile.createNewFile()
         NomediaFile.createNewFile()
     }
 }

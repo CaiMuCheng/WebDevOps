@@ -8,48 +8,44 @@ import android.view.Gravity
 import android.view.Menu
 import android.view.MenuItem
 import android.view.View
-import android.view.WindowManager
-import android.webkit.WebChromeClient
-import android.webkit.WebView
-import android.webkit.WebViewClient
 import androidx.activity.viewModels
 import androidx.appcompat.widget.PopupMenu
 import androidx.core.content.ContextCompat
 import androidx.core.view.GravityCompat
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
-import com.google.android.material.progressindicator.LinearProgressIndicator
 import com.google.android.material.tabs.TabLayout
 import com.google.android.material.tabs.TabLayout.OnTabSelectedListener
-import com.mucheng.text.model.standard.TextModel
 import com.mucheng.web.devops.R
 import com.mucheng.web.devops.base.BaseActivity
 import com.mucheng.web.devops.config.GlobalConfig
 import com.mucheng.web.devops.data.model.FileItem
-import com.mucheng.web.devops.data.model.OperatorItem
 import com.mucheng.web.devops.databinding.ActivityEditorBinding
 import com.mucheng.web.devops.manager.PluginManager
-import com.mucheng.web.devops.openapi.calljs.App
+import com.mucheng.web.devops.openapi.editor.colorScheme.AtomOneDarkColorScheme
+import com.mucheng.web.devops.openapi.editor.colorScheme.QuietLightColorScheme
+import com.mucheng.web.devops.openapi.editor.lang.php.impl.PhpLanguage
 import com.mucheng.web.devops.openapi.util.FileUtil
 import com.mucheng.web.devops.openapi.view.LoadingComponent
 import com.mucheng.web.devops.path.ProjectDir
 import com.mucheng.web.devops.ui.adapter.FileSelectorAdapter
-import com.mucheng.web.devops.ui.adapter.OperatorTableAdapter
 import com.mucheng.web.devops.ui.view.ComposableDialog
 import com.mucheng.web.devops.ui.viewmodel.EditorViewModel
 import com.mucheng.web.devops.util.AppCoroutine
+import com.mucheng.web.devops.util.TypefaceUtil
 import com.mucheng.web.devops.util.getFile
 import com.mucheng.webops.plugin.data.ObservableValue
 import com.mucheng.webops.plugin.data.Workspace
 import com.mucheng.webops.plugin.data.info.ComponentInfo
 import es.dmoral.toasty.Toasty
-import kotlinx.coroutines.CancellationException
-import kotlinx.coroutines.CoroutineName
-import kotlinx.coroutines.Dispatchers
+import io.github.rosemoe.sora.event.ContentChangeEvent
+import io.github.rosemoe.sora.text.ContentCreator
+import io.github.rosemoe.sora.widget.CodeEditor
+import io.github.rosemoe.sora.widget.component.Magnifier
+import io.github.rosemoe.sora.widget.subscribeEvent
+import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.launch
 import kotlinx.coroutines.sync.Mutex
-import kotlinx.coroutines.withContext
 import java.io.File
 
 class EditorActivity : BaseActivity(), FileSelectorAdapter.FileSelectorCallback {
@@ -79,41 +75,12 @@ class EditorActivity : BaseActivity(), FileSelectorAdapter.FileSelectorCallback 
 
     private val progressStateFlow = MutableStateFlow(0)
 
-    private val app by lazy {
-        App(
-            AppCoroutine,
-            viewBinding.editor
-        ).apply {
-            setDark(GlobalConfig.isDarkThemeEnabled())
-        }
-    }
-
-    private val operatorAdapter by lazy {
-        OperatorTableAdapter(this, ArrayList<OperatorItem>().apply {
-            this.add(OperatorItem("→", "    "))
-            this.addAll(GlobalConfig.getInstance().getOperatorInputCharTable().map {
-                OperatorItem(it)
-            })
-        }).apply {
-            setOnInsertTextListener(object : OperatorTableAdapter.OnInsertTextListener {
-
-                override fun onInsertText(text: String) {
-                    app.insert(text)
-                }
-
-            })
-        }
-    }
-
-    @Suppress("DEPRECATION")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         viewBinding = ActivityEditorBinding.inflate(layoutInflater)
         setContentView(viewBinding.root)
         val path = intent.getStringExtra("path") ?: return finish()
         val workspace = Workspace().apply { loadFrom(File(path)) }
-
-        window.setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_ADJUST_RESIZE)
 
         editorViewModel.workspace = workspace
 
@@ -128,7 +95,7 @@ class EditorActivity : BaseActivity(), FileSelectorAdapter.FileSelectorCallback 
         recyclerView.layoutManager = LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false)
         recyclerView.adapter = fileSelectorAdapter
 
-        editorViewModel.plugin = PluginManager.findPluginByProjectId(workspace.getProjectId())
+        editorViewModel.plugin = PluginManager.findPluginByProjectId(workspace.getProjectId()) ?: return finish()
         editorViewModel.setCurrentDir(File(workspace.getOpenFile()).parentFile!!)
         viewBinding.swipeRefreshLayout.setOnRefreshListener {
             val currentDir = editorViewModel.getCurrentDir()
@@ -275,17 +242,40 @@ class EditorActivity : BaseActivity(), FileSelectorAdapter.FileSelectorCallback 
 
         })
 
-        val symbolTable = viewBinding.symbolTable
-        symbolTable.layoutManager = LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false)
-        symbolTable.adapter = operatorAdapter
-
         val editor = viewBinding.editor
+        val symbolTable = viewBinding.symbolTable
+        val globalConfig = GlobalConfig.getInstance()
+        val handle = buildList {
+            add("→")
+            addAll(globalConfig.getOperatorInputCharTable())
+        }
+        val typedArray = handle.toTypedArray()
+        symbolTable.bindEditor(editor)
+        symbolTable.addSymbols(
+            typedArray,
+            typedArray.mapIndexed { index, str -> if (index == 0) "\t" else str }.toTypedArray()
+        )
+        symbolTable.forEachButton {
+            it.typeface = TypefaceUtil.getTypeface()
+        }
+        editor.apply {
+            typefaceLineNumber = TypefaceUtil.getTypeface()
+            typefaceText = TypefaceUtil.getTypeface()
+            setLineSpacing(2f, 1.1f)
+            nonPrintablePaintingFlags =
+                CodeEditor.FLAG_DRAW_WHITESPACE_LEADING or CodeEditor.FLAG_DRAW_LINE_SEPARATOR or CodeEditor.FLAG_DRAW_WHITESPACE_IN_SELECTION
+            getComponent(Magnifier::class.java).isEnabled = true
+            colorScheme = if (GlobalConfig.isDarkThemeEnabled()) AtomOneDarkColorScheme() else QuietLightColorScheme()
+        }
+
+        editorViewModel.plugin!!.pluginMain.setAutoCompletionEnabled(
+            GlobalConfig.getInstance().isAutoCompletionEnabled()
+        )
         editorViewModel.plugin!!.pluginMain.apply {
             onOpenProject(
                 this@EditorActivity,
                 workspace,
                 editor,
-                app,
                 ObservableValue(progressStateFlow)
             )
         }
@@ -299,65 +289,43 @@ class EditorActivity : BaseActivity(), FileSelectorAdapter.FileSelectorCallback 
             }
         }
 
-        app.setOnTextChangedListener(object : App.OnTextChangedListener {
-
-            override fun onTextChanged(value: String) {
-                AppCoroutine.launch(CoroutineName("SaveFileCoroutine") + Dispatchers.IO) {
-                    val currentFile = editorViewModel.getCurrentFile() ?: return@launch
-                    try {
-                        val bufferedWriter = currentFile.bufferedWriter()
-                        bufferedWriter.use {
-                            bufferedWriter.write(value)
+        editor.subscribeEvent<ContentChangeEvent> { _, _ ->
+            AppCoroutine.launch(CoroutineName("SaveFileCoroutine") + Dispatchers.IO) {
+                val currentFile = editorViewModel.getCurrentFile() ?: return@launch
+                try {
+                    val bufferedWriter = currentFile.bufferedWriter()
+                    bufferedWriter.use {
+                        val content = editor.text
+                        val lineCount = content.lineCount
+                        var workLine = 0
+                        while (workLine <= lineCount) {
+                            val contentLine = content.getLine(workLine)
+                            bufferedWriter.write(contentLine.toString())
                             bufferedWriter.flush()
+                            if (workLine + 1 < lineCount) {
+                                bufferedWriter.write(contentLine.lineSeparator.content)
+                                bufferedWriter.flush()
+                            }
+                            ++workLine
                         }
-                    } catch (e: Throwable) {
-                        if (e is CancellationException) {
-                            throw e
-                        }
+                    }
+                } catch (e: Throwable) {
+                    if (e is CancellationException) {
+                        throw e
                     }
                 }
             }
-
-        })
-
-        editor.webChromeClient = object : WebChromeClient() {
-
-            override fun onProgressChanged(view: WebView?, newProgress: Int) {
-                super.onProgressChanged(view, newProgress)
-                if (newProgress == 0) {
-                    viewBinding.editor.visibility = View.GONE
-                    viewBinding.placeholder.visibility = View.VISIBLE
-                }
-
-                if (newProgress == 100) {
-                    viewBinding.placeholder.visibility = View.GONE
-                    viewBinding.editor.visibility = View.VISIBLE
-                }
-            }
-
         }
-        editor.addJavascriptInterface(app, "App")
-    }
 
-    override fun onResume() {
-        super.onResume()
-        val editor = viewBinding.editor
-        editor.onResume()
-    }
-
-    override fun onPause() {
-        super.onPause()
-        val editor = viewBinding.editor
-        editor.onPause()
     }
 
     override fun onDestroy() {
         val workspace = editorViewModel.workspace!!
         val editor = viewBinding.editor
         editorViewModel.plugin!!.pluginMain.apply {
-            onCloseProject(this@EditorActivity, workspace, editor, app)
+            onCloseProject(this@EditorActivity, workspace, editor)
         }
-        editor.destroy()
+        editor.release()
         super.onDestroy()
     }
 
@@ -404,19 +372,13 @@ class EditorActivity : BaseActivity(), FileSelectorAdapter.FileSelectorCallback 
         mainScope.launch(CoroutineName("StatisticsFileCoroutine") + Dispatchers.IO) {
             statisticsCoroutineLock.lock()
             try {
-                val textModel = TextModel(app.getChangedCode())
-                val totalCapacity = textModel.capacity
-                val formatCapacity = FileUtil.formatBytes(totalCapacity)
-                val totalBytes = textModel.length.toLong()
+                val editor = viewBinding.editor
+                val totalBytes = editor.text.length.toLong()
                 val formatBytes = FileUtil.formatBytes(totalBytes)
-                val useMemoryBytes = totalCapacity + totalBytes
-                val useMemoryFormatBytes = FileUtil.formatBytes(useMemoryBytes)
-                val totalLine = textModel.lastLine
+                val totalLine = editor.text.lineCount + 1
                 val builtText = buildString {
                     append("文件名称: ${editorViewModel.getCurrentFile()?.name}").appendLine()
-                    append("花费容量: $formatCapacity ($totalCapacity bytes)").appendLine()
                     append("字节数: $formatBytes ($totalBytes bytes)").appendLine()
-                    append("共用内存: $useMemoryFormatBytes ($useMemoryBytes bytes)").appendLine()
                     append("总行数: $totalLine")
                 }
                 withContext(Dispatchers.Main) {
@@ -549,8 +511,7 @@ class EditorActivity : BaseActivity(), FileSelectorAdapter.FileSelectorCallback 
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
         menuInflater.inflate(R.menu.menu_activity_editor, menu)
         val menuItem = menu.findItem(R.id.run)
-        val indicator: LinearProgressIndicator = viewBinding.indicator
-
+        val indicator = viewBinding.indicator
         mainScope.launch(CoroutineName("IndicatorObserverCoroutine")) {
             progressStateFlow.collect {
                 val progress = it
@@ -568,6 +529,7 @@ class EditorActivity : BaseActivity(), FileSelectorAdapter.FileSelectorCallback 
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        val editor = viewBinding.editor
         when (item.itemId) {
 
             android.R.id.home -> {
@@ -575,11 +537,11 @@ class EditorActivity : BaseActivity(), FileSelectorAdapter.FileSelectorCallback 
             }
 
             R.id.undo -> {
-                app.undo()
+                editor.undo()
             }
 
             R.id.redo -> {
-                app.redo()
+                editor.redo()
             }
 
             R.id.run -> {
@@ -622,25 +584,16 @@ class EditorActivity : BaseActivity(), FileSelectorAdapter.FileSelectorCallback 
             openFileCoroutineLock.lock()
             try {
                 editorViewModel.setCurrentFile(file)
-                app.setCode(
-                    try {
-                        file.readText()
-                    } catch (e: Throwable) {
-                        if (e is CancellationException) {
-                            throw e
-                        }
-                        ""
-                    }
-                )
-                app.setChangedCode(app.getCode())
+                val content = ContentCreator.fromReader(file.reader())
                 withContext(Dispatchers.Main) {
+                    editor.setText(content)
                     loadingComponent.dismiss()
                     callback()
                     viewBinding.tabLayout.visibility = View.VISIBLE
                     editorViewModel.plugin!!.pluginMain.onOpenFile(
-                        this@EditorActivity, file, editor, app
+                        this@EditorActivity, file, editor
                     )
-                    editor.loadUrl("file:///android_asset/editor/editor.html")
+                    editor.setEditorLanguage(PhpLanguage())
                 }
             } finally {
                 openFileCoroutineLock.unlock()

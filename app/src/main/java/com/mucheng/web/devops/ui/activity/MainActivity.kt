@@ -14,6 +14,7 @@ import com.mucheng.web.devops.base.BaseFragment
 import com.mucheng.web.devops.databinding.ActivityMainBinding
 import com.mucheng.web.devops.dialog.PrivacyPolicyDialog
 import com.mucheng.web.devops.manager.PluginManager
+import com.mucheng.web.devops.openapi.util.FileUtil
 import com.mucheng.web.devops.openapi.view.LoadingComponent
 import com.mucheng.web.devops.path.CopyNativePlugins
 import com.mucheng.web.devops.path.CreateCoreFiles
@@ -86,14 +87,20 @@ class MainActivity : BaseActivity() {
 
 
     private fun loadPlugins() {
-        PluginManager.loadPlugins {
+        PluginManager.loadPlugins { e, file ->
             MaterialAlertDialogBuilder(this@MainActivity)
                 .setTitle("此插件无法加载")
-                .setMessage("异常: ${it.stackTraceToString()}")
+                .setMessage(buildString {
+                    append("在路径: ${file.absolutePath}").appendLine()
+                    append("异常: ${e.stackTraceToString()}")
+                })
+                .setNeutralButton("删除") { _, _ ->
+                    FileUtil.deleteFile(file)
+                }
                 .setPositiveButton("确定", null)
                 .setCancelable(false)
                 .show()
-            it.printStackTrace()
+            e.printStackTrace()
         }
     }
 

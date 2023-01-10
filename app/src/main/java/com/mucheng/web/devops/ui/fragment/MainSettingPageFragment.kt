@@ -88,7 +88,7 @@ class MainSettingPageFragment : BaseFragment(), SettingAdapter.SettingItemCallba
             listOf(
                 TitleSettingItem("通用"),
                 SwitchSettingItem(DarkTheme, "启用深色主题", GlobalConfig.isDarkThemeEnabled()),
-                ClickableSettingItem(AppTypeface, "应用的全局字体"),
+                /*ClickableSettingItem(AppTypeface, "应用的全局字体"),*/
                 TitleSettingItem("代码编辑器"),
                 SwitchSettingItem(
                     AutoCompletion,

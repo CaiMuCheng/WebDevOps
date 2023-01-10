@@ -1,6 +1,6 @@
 # WebDevOps
 
-A Android Web IDE supports code auto-completion and highlight, plugin (Supports Html, Css, JS, Json,
+A Android Web IDE supports code auto-completion and highlight, plugin (Supports Html, Css, JS, Json, Xml,
 Php etc)
 
 ## Join us
@@ -15,7 +15,7 @@ QQ group number: 1031450748
 
 ## About CodeEditor
 
-We use [MuCodeEditor](https://github.com/MuChengTeam/MuCodeEditor), This is a nice large text editor
+Now, we use [Sora-Editor](https://github.com/Rosemoe/sora-editor), This is a nice large text editor
 on Android.
 
 It provides for example auto-completion, show-line-number, Sticky line-number, zoom etc.

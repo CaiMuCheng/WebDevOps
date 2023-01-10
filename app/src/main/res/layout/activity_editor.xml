@@ -20,7 +20,6 @@
             android:layout_height="match_parent"
             android:orientation="vertical">
 
-
             <com.google.android.material.appbar.MaterialToolbar
                 android:id="@+id/toolbar"
                 android:layout_width="match_parent"
@@ -53,51 +52,34 @@
                 android:id="@+id/indicator"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:progress="0"
                 android:max="100" />
 
-            <androidx.constraintlayout.widget.ConstraintLayout
+            <androidx.appcompat.widget.LinearLayoutCompat
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:animateLayoutChanges="true">
+                android:orientation="vertical"
+                app:layout_constraintBottom_toTopOf="@+id/symbolTable"
+                app:layout_constraintTop_toTopOf="parent">
 
-                <androidx.recyclerview.widget.RecyclerView
-                    android:id="@+id/symbolTable"
-                    android:layout_width="match_parent"
-                    android:layout_height="50dp"
-                    android:overScrollMode="never"
-                    app:layout_constraintBottom_toBottomOf="parent"
-                    app:layout_constraintEnd_toEndOf="parent"
-                    app:layout_constraintStart_toStartOf="parent" />
-
-                <androidx.appcompat.widget.LinearLayoutCompat
-                    android:id="@+id/placeholder"
-                    android:layout_width="match_parent"
-                    android:layout_height="0dp"
-                    android:gravity="center"
-                    android:orientation="vertical"
-                    app:layout_constraintBottom_toTopOf="@+id/symbolTable"
-                    app:layout_constraintTop_toTopOf="parent">
-
-                    <com.mucheng.web.devops.ui.view.MaterialTextViewX
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_gravity="center"
-                        android:text="正在准备工作空间...."
-                        android:textColor="?attr/colorOnSurface"
-                        android:textSize="18sp"
-                        tools:ignore="HardcodedText" />
-
-                </androidx.appcompat.widget.LinearLayoutCompat>
-
-                <com.mucheng.web.devops.openapi.view.WebViewX
+                <io.github.rosemoe.sora.widget.CodeEditor
                     android:id="@+id/editor"
                     android:layout_width="match_parent"
-                    android:layout_height="0dp"
-                    android:visibility="gone"
-                    app:layout_constraintBottom_toTopOf="@+id/symbolTable"
-                    app:layout_constraintTop_toTopOf="parent" />
+                    android:layout_height="match_parent" />
 
-            </androidx.constraintlayout.widget.ConstraintLayout>
+                <HorizontalScrollView
+                    android:layout_width="match_parent"
+                    android:layout_height="40dp"
+                    android:layout_marginTop="-40dp">
+
+                    <io.github.rosemoe.sora.widget.SymbolInputView
+                        android:id="@+id/symbolTable"
+                        android:layout_width="wrap_content"
+                        android:layout_height="40dp" />
+
+                </HorizontalScrollView>
+
+            </androidx.appcompat.widget.LinearLayoutCompat>
 
         </androidx.appcompat.widget.LinearLayoutCompat>
 

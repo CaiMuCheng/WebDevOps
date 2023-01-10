@@ -16,14 +16,8 @@ dependencyResolutionManagement {
 }
 rootProject.name = "WebDev"
 include ':app'
-include ':easy-animation'
 include ':plugin'
 include ':plugin-static-project'
 include ':openapi'
-//include ':editor'
-include ':text-model'
-//include ':language'
-//include ':annotation-mark'
 include ':plugin-lmmp-project'
 include ':plugin-httpd-project'
-//include ':text-model-android'

@@ -5,14 +5,7 @@ import android.os.Build
 import android.util.Log
 import androidx.annotation.Keep
 import com.mucheng.web.devops.exceptions.PluginException
-import com.mucheng.web.devops.path.CacheDir
-import com.mucheng.web.devops.path.FilesDir
-import com.mucheng.web.devops.path.MainDir
-import com.mucheng.web.devops.path.OatDir
-import com.mucheng.web.devops.path.PluginDir
-import com.mucheng.web.devops.path.PluginStoreDir
-import com.mucheng.web.devops.path.ProjectDir
-import com.mucheng.web.devops.path.StorageDir
+import com.mucheng.web.devops.path.*
 import com.mucheng.web.devops.plugin.Plugin
 import com.mucheng.web.devops.plugin.PluginResources
 import com.mucheng.web.devops.util.AppCoroutine
@@ -29,16 +22,26 @@ object PluginManager {
 
     private val plugins: MutableList<Plugin> = ArrayList()
 
-    fun loadPlugins(onError: (e: Throwable) -> Unit = {}) {
+    fun loadPlugins(onError: (e: Throwable, file: File) -> Unit = { _, _ -> }) {
         plugins.clear()
-        val listFiles = PluginDir.listFiles() ?: emptyArray()
+        var listFiles =
+            PluginDir.listFiles()?.filter { it.isFile && it.name.endsWith(".apk") } ?: emptyList()
+        listFiles = listFiles.sortedWith(Comparator { o1, o2 ->
+            val diff = o1.lastModified() - o2.lastModified()
+            return@Comparator if (diff > 0) {
+                -1
+            } else if (diff == 0L) {
+                0
+            } else {
+                1
+            }
+        })
         for (file in listFiles) {
-            if (file.isFile && file.name.endsWith(".apk")) {
-                try {
-                    loadExternalPlugin(file)
-                } catch (e: Throwable) {
-                    onError(e)
-                }
+            try {
+                loadExternalPlugin(file)
+                Log.e("PluginManager", "Loaded plugin: ${file.absolutePath}")
+            } catch (e: Throwable) {
+                onError(e, file)
             }
         }
     }

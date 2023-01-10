@@ -15,17 +15,17 @@ object TypefaceUtil {
 
         typeface = try {
             if (typefacePath == "null") {
-                Typeface.createFromAsset(assets, "font/RecMonoLinear-Regular.ttf")
+                Typeface.createFromAsset(assets, "font/MiSans-Regular.ttf")
             } else {
                 try {
                     val checkedTypeface = Typeface.createFromFile(typefacePath)
                     if (checkedTypeface == Typeface.DEFAULT) {
-                        Typeface.createFromAsset(assets, "font/RecMonoLinear-Regular.ttf")
+                        Typeface.createFromAsset(assets, "font/MiSans-Regular.ttf")
                     } else {
                         checkedTypeface
                     }
                 } catch (e: Throwable) {
-                    Typeface.createFromAsset(assets, "font/RecMonoLinear-Regular.ttf")
+                    Typeface.createFromAsset(assets, "font/MiSans-Regular.ttf")
                 }
             }
         } catch (e: Throwable) {

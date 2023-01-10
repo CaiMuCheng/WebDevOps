@@ -4,16 +4,16 @@
     "type": "APK",
     "kind": "Directory"
   },
-  "applicationId": "com.mucheng.web.devops.statics",
+  "applicationId": "com.mucheng.web.devops",
   "variantName": "release",
   "elements": [
     {
       "type": "SINGLE",
       "filters": [],
       "attributes": [],
-      "versionCode": 1,
-      "versionName": "1.0",
-      "outputFile": "plugin-static-project-release.apk"
+      "versionCode": 15,
+      "versionName": "2.0.8.0",
+      "outputFile": "app-release.apk"
     }
   ],
   "elementType": "File"

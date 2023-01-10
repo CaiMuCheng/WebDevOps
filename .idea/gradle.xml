@@ -11,13 +11,11 @@
           <set>
             <option value="$PROJECT_DIR$" />
             <option value="$PROJECT_DIR$/app" />
-            <option value="$PROJECT_DIR$/easy-animation" />
             <option value="$PROJECT_DIR$/openapi" />
             <option value="$PROJECT_DIR$/plugin" />
             <option value="$PROJECT_DIR$/plugin-httpd-project" />
             <option value="$PROJECT_DIR$/plugin-lmmp-project" />
             <option value="$PROJECT_DIR$/plugin-static-project" />
-            <option value="$PROJECT_DIR$/text-model" />
           </set>
         </option>
       </GradleProjectSettings>

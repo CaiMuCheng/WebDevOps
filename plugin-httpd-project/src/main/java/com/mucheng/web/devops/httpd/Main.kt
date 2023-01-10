@@ -6,11 +6,14 @@ import android.content.Intent
 import android.content.res.Resources
 import android.graphics.drawable.Drawable
 import androidx.appcompat.app.AppCompatActivity
-import com.mucheng.web.devops.openapi.calljs.App
+import com.mucheng.web.devops.openapi.editor.lang.css.impl.CssLanguage
+import com.mucheng.web.devops.openapi.editor.lang.html.impl.HtmlLanguage
+import com.mucheng.web.devops.openapi.editor.lang.javascript.impl.JavaScriptLanguage
+import com.mucheng.web.devops.openapi.editor.lang.json.impl.JsonLanguage
+import com.mucheng.web.devops.openapi.editor.lang.xml.impl.XmlLanguage
 import com.mucheng.web.devops.openapi.util.FileUtil
 import com.mucheng.web.devops.openapi.util.TimeUtil
 import com.mucheng.web.devops.openapi.view.LoadingComponent
-import com.mucheng.web.devops.openapi.view.WebViewX
 import com.mucheng.webops.plugin.PluginActivity
 import com.mucheng.webops.plugin.PluginMain
 import com.mucheng.webops.plugin.check.ProjectCreationChecker
@@ -21,11 +24,11 @@ import com.mucheng.webops.plugin.data.ObservableValue
 import com.mucheng.webops.plugin.data.Workspace
 import com.mucheng.webops.plugin.data.info.ComponentInfo
 import es.dmoral.toasty.Toasty
-import kotlinx.coroutines.CoroutineName
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
+import io.github.rosemoe.sora.langs.textmate.TextMateColorScheme
+import io.github.rosemoe.sora.langs.textmate.TextMateLanguage
+import io.github.rosemoe.sora.langs.textmate.registry.ThemeRegistry
+import io.github.rosemoe.sora.widget.CodeEditor
+import kotlinx.coroutines.*
 import net.lingala.zip4j.io.inputstream.ZipInputStream
 import java.io.File
 
@@ -68,8 +71,7 @@ class Main : PluginMain() {
     override fun onOpenProject(
         activity: AppCompatActivity,
         workspace: Workspace,
-        webView: WebViewX,
-        app: App,
+        editor: CodeEditor,
         observableProgress: ObservableValue<Int>
     ) {
         this.workspace = workspace
@@ -103,10 +105,9 @@ class Main : PluginMain() {
     override fun onCloseProject(
         activity: AppCompatActivity,
         workspace: Workspace,
-        webView: WebViewX,
-        app: App,
+        editor: CodeEditor
     ) {
-        super.onCloseProject(activity, workspace, webView, app)
+        super.onCloseProject(activity, workspace, editor)
         val binDir = File("${files.FilesDir}/httpd/usr/bin")
         ShellExecutor.exec(binDir, listOf("./httpd", "-k", "stop"))
     }
@@ -126,26 +127,60 @@ class Main : PluginMain() {
     override fun onOpenFile(
         activity: AppCompatActivity,
         file: File,
-        webView: WebViewX,
-        app: App,
+        editor: CodeEditor,
     ) {
-        super.onOpenFile(activity, file, webView, app)
+        super.onOpenFile(activity, file, editor)
         val fileName = file.name
         when {
             fileName.endsWith(".html") || fileName.endsWith(".htm") -> {
-                app.setLanguage("html")
+                editor.setEditorLanguage(HtmlLanguage())
             }
 
             fileName.endsWith(".css") -> {
-                app.setLanguage("css")
+                editor.setEditorLanguage(CssLanguage())
             }
 
             fileName.endsWith(".js") -> {
-                app.setLanguage("javascript")
+                editor.setEditorLanguage(JavaScriptLanguage())
             }
 
-            else -> app.setLanguage("text")
+            fileName.endsWith(".json") -> {
+                editor.setEditorLanguage(JsonLanguage())
+            }
+
+            fileName.endsWith(".xml") -> {
+                editor.setEditorLanguage(XmlLanguage())
+            }
+
+            else -> editor.setEditorLanguage(null)
         }
+    }
+
+    private fun ensureTextmateTheme(editor: CodeEditor) {
+        var editorColorScheme = editor.colorScheme
+        if (editorColorScheme !is TextMateColorScheme) {
+            editorColorScheme = TextMateColorScheme.create(ThemeRegistry.getInstance())
+            editor.colorScheme = editorColorScheme
+        }
+    }
+
+    private fun setEditorLanguage(editor: CodeEditor, scopeName: String) {
+        ensureTextmateTheme(editor)
+        val editorLanguage = editor.editorLanguage
+        val language = if (editorLanguage is TextMateLanguage) {
+            editorLanguage.updateLanguage(
+                scopeName
+            )
+            editorLanguage
+        } else {
+            TextMateLanguage.create(
+                scopeName,
+                isAutoCompletionEnabled
+            )
+        }
+        editor.setEditorLanguage(
+            language
+        )
     }
 
     override suspend fun onInstall(activity: AppCompatActivity) {

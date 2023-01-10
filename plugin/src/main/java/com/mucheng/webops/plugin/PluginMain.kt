@@ -9,15 +9,14 @@ import androidx.annotation.Keep
 import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.switchmaterial.SwitchMaterial
-import com.mucheng.web.devops.openapi.calljs.App
 import com.mucheng.web.devops.openapi.util.FileUtil
-import com.mucheng.web.devops.openapi.view.WebViewX
 import com.mucheng.webops.plugin.data.CreateInfo
 import com.mucheng.webops.plugin.data.Files
 import com.mucheng.webops.plugin.data.ObservableValue
 import com.mucheng.webops.plugin.data.PluginConfigItem
 import com.mucheng.webops.plugin.data.Project
 import com.mucheng.webops.plugin.data.Workspace
+import io.github.rosemoe.sora.widget.CodeEditor
 import kotlinx.coroutines.CoroutineScope
 import java.io.File
 
@@ -43,6 +42,9 @@ abstract class PluginMain {
     protected lateinit var files: Files
 
     protected lateinit var StoreDir: File
+
+    protected var isAutoCompletionEnabled = false
+        private set
 
     /**
      * 当插件初始化时调用
@@ -76,8 +78,7 @@ abstract class PluginMain {
     open fun onOpenProject(
         activity: AppCompatActivity,
         workspace: Workspace,
-        webView: WebViewX,
-        app: App,
+        editor: CodeEditor,
         observableProgress: ObservableValue<Int>
     ) {
     }
@@ -85,8 +86,7 @@ abstract class PluginMain {
     open fun onCloseProject(
         activity: AppCompatActivity,
         workspace: Workspace,
-        webView: WebViewX,
-        app: App
+        editor: CodeEditor
     ) {
 
     }
@@ -94,8 +94,7 @@ abstract class PluginMain {
     open fun onOpenFile(
         activity: AppCompatActivity,
         file: File,
-        webView: WebViewX,
-        app: App
+        editor: CodeEditor
     ) {
 
     }
@@ -141,6 +140,10 @@ abstract class PluginMain {
         adapter: RecyclerView.Adapter<*>
     ) {
 
+    }
+
+    fun setAutoCompletionEnabled(isAutoCompletionEnabled: Boolean) {
+        this.isAutoCompletionEnabled = isAutoCompletionEnabled
     }
 
     open fun isSupportedConfig(): Boolean {

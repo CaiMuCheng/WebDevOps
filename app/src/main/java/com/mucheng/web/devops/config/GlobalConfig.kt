@@ -56,7 +56,7 @@ class GlobalConfig private constructor() : BaseBean() {
                             input.use {
                                 props.loadFromXML(input)
                             }
-                        }.exceptionOrNull()?.printStackTrace()
+                        }
                     }
                 }
             }
@@ -190,7 +190,7 @@ class GlobalConfig private constructor() : BaseBean() {
     }
 
     fun setOperatorInputCharTable(input: String) {
-        val value = input.trim().replace(" +".toRegex(), "")
+        val value = input.trim().replace(" +".toRegex(), " ")
         set(ConfigKeyEnum.OperatorInputCharTable, value)
     }
 
