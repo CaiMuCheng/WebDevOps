@@ -3,6 +3,7 @@ package com.mucheng.web.devops.openapi.editor.lang.html.impl
 import com.mucheng.web.devops.openapi.editor.lang.html.HTMLLexer
 import com.mucheng.web.devops.openapi.editor.lang.html.impl.HtmlState.Companion.STATE_INCOMPLETE_COMMENT
 import com.mucheng.web.devops.openapi.editor.lang.html.impl.HtmlState.Companion.STATE_NORMAL
+import com.mucheng.web.devops.openapi.reader.CharSequenceReader
 import io.github.rosemoe.sora.lang.analysis.AsyncIncrementalAnalyzeManager
 import io.github.rosemoe.sora.lang.analysis.IncrementalAnalyzeManager
 import io.github.rosemoe.sora.lang.completion.IdentifierAutoComplete.SyncIdentifiers
@@ -135,8 +136,11 @@ class HtmlIncrementalAnalyzeManager : AsyncIncrementalAnalyzeManager<HtmlState, 
     }
 
     private fun tokenizeNormal(text: CharSequence, offset: Int, tokens: MutableList<Long>): Int {
+        val charSequenceReader = CharSequenceReader(text)
+        charSequenceReader.skip(offset.toLong())
+
         val tokenizer = obtainTokenizer()
-        tokenizer.inputStream = CharStreams.fromString(text.substring(offset, text.length))
+        tokenizer.inputStream = CharStreams.fromReader(charSequenceReader)
 
         var token: Token
         var state = STATE_NORMAL

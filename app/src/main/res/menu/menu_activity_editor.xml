@@ -1,27 +1,46 @@
 <?xml version="1.0" encoding="utf-8"?>
 <menu xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools">
+      xmlns:app="http://schemas.android.com/apk/res-auto"
+      xmlns:tools="http://schemas.android.com/tools">
 
     <item
-        android:id="@+id/undo"
-        android:icon="@drawable/ic_undo"
-        android:title="撤销"
-        app:showAsAction="always"
-        tools:ignore="AlwaysShowAction,HardcodedText" />
+            android:id="@+id/undo"
+            android:icon="@drawable/ic_undo"
+            android:title="撤销"
+            app:showAsAction="always"
+            tools:ignore="AlwaysShowAction,HardcodedText"/>
 
     <item
-        android:id="@+id/redo"
-        android:icon="@drawable/ic_redo"
-        android:title="恢复"
-        app:showAsAction="always"
-        tools:ignore="AlwaysShowAction,HardcodedText" />
+            android:id="@+id/redo"
+            android:icon="@drawable/ic_redo"
+            android:title="恢复"
+            app:showAsAction="always"
+            tools:ignore="AlwaysShowAction,HardcodedText"/>
 
     <item
-        android:id="@+id/run"
-        android:icon="@drawable/ic_run"
-        android:title="运行"
-        app:showAsAction="always"
-        tools:ignore="AlwaysShowAction,HardcodedText" />
+            android:id="@+id/run"
+            android:icon="@drawable/ic_run"
+            android:title="运行"
+            app:showAsAction="always"
+            tools:ignore="AlwaysShowAction,HardcodedText"/>
+
+    <item
+            android:icon="@drawable/ic_dots_vertical"
+            android:title="更多"
+            app:showAsAction="always"
+            tools:ignore="HardcodedText,AlwaysShowAction">
+
+        <menu>
+
+            <item
+                    android:id="@+id/pluginOptions"
+                    android:title="插件选项"
+                    app:showAsAction="never">
+                <menu/>
+            </item>
+
+        </menu>
+
+    </item>
 
 </menu>

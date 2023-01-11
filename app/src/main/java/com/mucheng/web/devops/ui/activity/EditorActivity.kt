@@ -539,6 +539,8 @@ class EditorActivity : BaseActivity(), FileSelectorAdapter.FileSelectorCallback 
 
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
         menuInflater.inflate(R.menu.menu_activity_editor, menu)
+        editorViewModel.plugin!!.pluginMain.onCreateOptionsMenu(menu.findItem(R.id.pluginOptions).subMenu)
+
         val menuItem = menu.findItem(R.id.run)
         val indicator = viewBinding.indicator
         mainScope.launch(CoroutineName("IndicatorObserverCoroutine")) {
@@ -579,6 +581,10 @@ class EditorActivity : BaseActivity(), FileSelectorAdapter.FileSelectorCallback 
                 intent.putExtra("workspacePath", workspace.getFile().absolutePath)
                 intent.putExtra("projectId", workspace.getProjectId())
                 startActivity(intent)
+            }
+
+            else -> {
+                editorViewModel.plugin!!.pluginMain.onOptionsItemSelected(item)
             }
 
         }

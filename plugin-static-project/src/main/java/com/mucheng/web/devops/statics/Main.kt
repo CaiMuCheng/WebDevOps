@@ -5,6 +5,8 @@ import android.content.Context
 import android.content.Intent
 import android.content.res.Resources
 import android.graphics.drawable.Drawable
+import android.view.MenuItem
+import android.view.SubMenu
 import androidx.appcompat.app.AppCompatActivity
 import com.mucheng.web.devops.openapi.editor.lang.css.impl.CssLanguage
 import com.mucheng.web.devops.openapi.editor.lang.html.impl.HtmlLanguage
@@ -30,6 +32,10 @@ import java.io.File
 
 @Suppress("PrivatePropertyName")
 class Main : PluginMain() {
+
+    companion object {
+        private const val PACK = 155
+    }
 
     private lateinit var FrameworkDir: File
 
@@ -123,6 +129,18 @@ class Main : PluginMain() {
                 .onConfirm { result ->
                     onConfirm(result.createInfo, createInfo.activity)
                 }
+        }
+    }
+
+    override fun onCreateOptionsMenu(subMenu: SubMenu) {
+        super.onCreateOptionsMenu(subMenu)
+        subMenu.add(0, PACK, 0, "打包")
+    }
+
+    override fun onOptionsItemSelected(item: MenuItem) {
+        super.onOptionsItemSelected(item)
+        if (item.itemId == PACK) {
+            // Do apk pack.
         }
     }
 

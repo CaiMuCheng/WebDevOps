@@ -4,6 +4,7 @@ import com.mucheng.web.devops.openapi.editor.lang.javascript.JavaScriptLexer
 import com.mucheng.web.devops.openapi.editor.lang.javascript.JavaScriptLexer.*
 import com.mucheng.web.devops.openapi.editor.lang.javascript.impl.JavaScriptState.Companion.STATE_INCOMPLETE_COMMENT
 import com.mucheng.web.devops.openapi.editor.lang.javascript.impl.JavaScriptState.Companion.STATE_NORMAL
+import com.mucheng.web.devops.openapi.reader.CharSequenceReader
 import io.github.rosemoe.sora.lang.analysis.AsyncIncrementalAnalyzeManager
 import io.github.rosemoe.sora.lang.analysis.IncrementalAnalyzeManager
 import io.github.rosemoe.sora.lang.styling.CodeBlock
@@ -211,8 +212,12 @@ class JavaScriptIncrementalAnalyzeManager : AsyncIncrementalAnalyzeManager<JavaS
     }
 
     private fun tokenizeNormal(text: CharSequence, offset: Int, tokens: MutableList<Long>): Int {
+        val charSequenceReader = CharSequenceReader(text)
+        charSequenceReader.skip(offset.toLong())
+
         val tokenizer = obtainTokenizer()
-        tokenizer.inputStream = CharStreams.fromString(text.substring(offset, text.length))
+        tokenizer.inputStream = CharStreams.fromReader(charSequenceReader)
+
         var token: Token
 
         var state = STATE_NORMAL

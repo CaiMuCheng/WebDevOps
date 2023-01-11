@@ -7,6 +7,7 @@ import com.mucheng.web.devops.openapi.editor.lang.php.impl.PhpState.Companion.ST
 import com.mucheng.web.devops.openapi.editor.lang.php.impl.PhpState.Companion.STATE_INCOMPLETE_PHP
 import com.mucheng.web.devops.openapi.editor.lang.php.impl.PhpState.Companion.STATE_INCOMPLETE_PHP_COMMENT
 import com.mucheng.web.devops.openapi.editor.lang.php.impl.PhpState.Companion.STATE_NORMAL
+import com.mucheng.web.devops.openapi.reader.CharSequenceReader
 import io.github.rosemoe.sora.lang.analysis.AsyncIncrementalAnalyzeManager
 import io.github.rosemoe.sora.lang.analysis.IncrementalAnalyzeManager
 import io.github.rosemoe.sora.lang.completion.IdentifierAutoComplete.SyncIdentifiers
@@ -19,7 +20,6 @@ import io.github.rosemoe.sora.widget.schemes.EditorColorScheme
 import org.antlr.v4.runtime.CharStreams
 import org.antlr.v4.runtime.Token
 
-// FIXME: Now php comment doestn't work....
 class PhpIncrementalAnalyzeManager : AsyncIncrementalAnalyzeManager<PhpState, Long>() {
 
     private val tokenizerProvider = ThreadLocal<PhpLexer>()
@@ -98,8 +98,11 @@ class PhpIncrementalAnalyzeManager : AsyncIncrementalAnalyzeManager<PhpState, Lo
     }
 
     private fun tokenizeNormal(text: CharSequence, offset: Int, tokens: MutableList<Long>): Int {
+        val charSequenceReader = CharSequenceReader(text)
+        charSequenceReader.skip(offset.toLong())
+
         val tokenizer = obtainTokenizer()
-        tokenizer.inputStream = CharStreams.fromString(text.substring(offset, text.length))
+        tokenizer.inputStream = CharStreams.fromReader(charSequenceReader)
 
         var token: Token
         var state = STATE_NORMAL
@@ -146,8 +149,11 @@ class PhpIncrementalAnalyzeManager : AsyncIncrementalAnalyzeManager<PhpState, Lo
         val suffix = "?>"
         val endIndex = text.indexOf(suffix, offset)
         if (endIndex >= 0) {
+            val charSequenceReader = CharSequenceReader(text)
+            charSequenceReader.skip(offset.toLong())
+
             val tokenizer = obtainTokenizer()
-            tokenizer.inputStream = CharStreams.fromString(text.substring(offset, endIndex))
+            tokenizer.inputStream = CharStreams.fromReader(charSequenceReader)
             tokenizer.mode(PHP)
 
             var token: Token
@@ -171,8 +177,11 @@ class PhpIncrementalAnalyzeManager : AsyncIncrementalAnalyzeManager<PhpState, Lo
             tokens.add(pack(INCOMPLETE_PHP_CLOSE, endIndex))
             return tokenizeNormal(text, endIndex + suffix.length, tokens)
         } else {
+            val charSequenceReader = CharSequenceReader(text)
+            charSequenceReader.skip(offset.toLong())
+
             val tokenizer = obtainTokenizer()
-            tokenizer.inputStream = CharStreams.fromString(text.substring(offset, text.length))
+            tokenizer.inputStream = CharStreams.fromReader(charSequenceReader)
             tokenizer.mode(PHP)
 
             var token: Token

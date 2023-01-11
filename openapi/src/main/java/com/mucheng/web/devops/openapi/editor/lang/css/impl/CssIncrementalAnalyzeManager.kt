@@ -2,6 +2,7 @@ package com.mucheng.web.devops.openapi.editor.lang.css.impl
 
 import com.mucheng.web.devops.openapi.editor.lang.css.css3Lexer
 import com.mucheng.web.devops.openapi.editor.lang.html.HTMLLexer
+import com.mucheng.web.devops.openapi.reader.CharSequenceReader
 import io.github.rosemoe.sora.lang.analysis.AsyncIncrementalAnalyzeManager
 import io.github.rosemoe.sora.lang.analysis.IncrementalAnalyzeManager
 import io.github.rosemoe.sora.lang.completion.IdentifierAutoComplete.SyncIdentifiers
@@ -114,7 +115,7 @@ class CssIncrementalAnalyzeManager : AsyncIncrementalAnalyzeManager<CssState, Lo
 
     private fun tokenizeNormal(text: CharSequence, tokens: MutableList<Long>) {
         val tokenizer = obtainTokenizer()
-        tokenizer.inputStream = CharStreams.fromString(text.substring(0, text.length))
+        tokenizer.inputStream = CharStreams.fromReader(CharSequenceReader(text))
 
         var token: Token
         while (tokenizer.nextToken().also { token = it }.type != css3Lexer.EOF) {

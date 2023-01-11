@@ -3,6 +3,8 @@ package com.mucheng.webops.plugin
 import android.content.Context
 import android.content.res.Resources
 import android.graphics.drawable.Drawable
+import android.view.MenuItem
+import android.view.SubMenu
 import android.view.View
 import androidx.annotation.CallSuper
 import androidx.annotation.Keep
@@ -113,6 +115,10 @@ abstract class PluginMain {
     }
 
     open suspend fun onCreateInfo(createInfo: CreateInfo) {}
+
+    open fun onCreateOptionsMenu(subMenu: SubMenu) {}
+
+    open fun onOptionsItemSelected(item: MenuItem) {}
 
     open fun onCreatePluginConfig(): List<PluginConfigItem> {
         return emptyList()
