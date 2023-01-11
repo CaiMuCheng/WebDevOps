@@ -9,7 +9,9 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.mucheng.web.devops.R
+import com.mucheng.web.devops.support.LanguageKeys
 import com.mucheng.web.devops.ui.adapter.ComponentInfoAdapter
+import com.mucheng.web.devops.util.supportedText
 import com.mucheng.webops.plugin.data.CreateInfo
 import com.mucheng.webops.plugin.data.CreateInfoResult
 import com.mucheng.webops.plugin.data.info.ComponentInfo
@@ -42,7 +44,7 @@ class CreateInfoDialog(context: Context) : MaterialAlertDialogBuilder(context) {
 
     init {
         setView(R.layout.layout_component_info)
-        setPositiveButton("确定", null)
+        setPositiveButton(supportedText(LanguageKeys.PermissionRequestOK), null)
     }
 
     @SuppressLint("NotifyDataSetChanged")
@@ -68,9 +70,9 @@ class CreateInfoDialog(context: Context) : MaterialAlertDialogBuilder(context) {
                 e.printStackTrace()
                 alertDialog.dismiss()
                 MaterialAlertDialogBuilder(context)
-                    .setTitle("无法分发 CreateInfo")
-                    .setMessage("异常: ${e.stackTraceToString()}")
-                    .setPositiveButton("确定", null)
+                    .setTitle(supportedText(LanguageKeys.CannotDispatchCreateInfo))
+                    .setMessage("${supportedText(LanguageKeys.Exception)}: ${e.stackTraceToString()}")
+                    .setPositiveButton(supportedText(LanguageKeys.PermissionRequestOK), null)
                     .setCancelable(false)
                     .show()
             }

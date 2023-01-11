@@ -2,6 +2,7 @@ package com.mucheng.web.devops.ui.activity
 
 import android.annotation.SuppressLint
 import android.content.Intent
+import android.graphics.Typeface
 import android.graphics.drawable.Drawable
 import android.os.Bundle
 import android.view.Gravity
@@ -18,13 +19,13 @@ import com.google.android.material.tabs.TabLayout
 import com.google.android.material.tabs.TabLayout.OnTabSelectedListener
 import com.mucheng.web.devops.R
 import com.mucheng.web.devops.base.BaseActivity
+import com.mucheng.web.devops.config.CursorAnimationType.*
 import com.mucheng.web.devops.config.GlobalConfig
 import com.mucheng.web.devops.data.model.FileItem
 import com.mucheng.web.devops.databinding.ActivityEditorBinding
 import com.mucheng.web.devops.manager.PluginManager
 import com.mucheng.web.devops.openapi.editor.colorScheme.AtomOneDarkColorScheme
 import com.mucheng.web.devops.openapi.editor.colorScheme.QuietLightColorScheme
-import com.mucheng.web.devops.openapi.editor.lang.php.impl.PhpLanguage
 import com.mucheng.web.devops.openapi.util.FileUtil
 import com.mucheng.web.devops.openapi.view.LoadingComponent
 import com.mucheng.web.devops.path.ProjectDir
@@ -41,7 +42,12 @@ import es.dmoral.toasty.Toasty
 import io.github.rosemoe.sora.event.ContentChangeEvent
 import io.github.rosemoe.sora.text.ContentCreator
 import io.github.rosemoe.sora.widget.CodeEditor
+import io.github.rosemoe.sora.widget.component.EditorAutoCompletion
 import io.github.rosemoe.sora.widget.component.Magnifier
+import io.github.rosemoe.sora.widget.getComponent
+import io.github.rosemoe.sora.widget.style.builtin.FadeCursorAnimator
+import io.github.rosemoe.sora.widget.style.builtin.MoveCursorAnimator
+import io.github.rosemoe.sora.widget.style.builtin.ScaleCursorAnimator
 import io.github.rosemoe.sora.widget.subscribeEvent
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -259,18 +265,41 @@ class EditorActivity : BaseActivity(), FileSelectorAdapter.FileSelectorCallback 
             it.typeface = TypefaceUtil.getTypeface()
         }
         editor.apply {
-            typefaceLineNumber = TypefaceUtil.getTypeface()
-            typefaceText = TypefaceUtil.getTypeface()
             setLineSpacing(2f, 1.1f)
+            val typeface = try {
+                val fontPath = globalConfig.getEditorTypefacePath()
+                if (fontPath == "null") Typeface.createFromAsset(
+                    assets,
+                    "font/JetBrainsMono-Regular.ttf"
+                ) else Typeface.createFromFile(globalConfig.getEditorTypefacePath())
+            } catch (e: Throwable) {
+                TypefaceUtil.getTypeface()
+            }
+            typefaceLineNumber = typeface
+            typefaceText = typeface
             nonPrintablePaintingFlags =
                 CodeEditor.FLAG_DRAW_WHITESPACE_LEADING or CodeEditor.FLAG_DRAW_LINE_SEPARATOR or CodeEditor.FLAG_DRAW_WHITESPACE_IN_SELECTION
-            getComponent(Magnifier::class.java).isEnabled = true
             colorScheme = if (GlobalConfig.isDarkThemeEnabled()) AtomOneDarkColorScheme() else QuietLightColorScheme()
+
+            getComponent<Magnifier>().isEnabled = true
+            getComponent<EditorAutoCompletion>().isEnabled = globalConfig.isAutoCompletionEnabled()
+
+            if (!globalConfig.isOperatorPanelEnabled()) {
+                viewBinding.symbolTableContainer.visibility = View.GONE
+            }
+            isCursorAnimationEnabled = globalConfig.isCursorAnimationEnabled()
+            isLineNumberEnabled = globalConfig.isLineNumberEnabled()
+            setPinLineNumber(globalConfig.isStickyLineNumberEnabled())
+
+            cursorAnimator = when (globalConfig.getCursorAnimationType()) {
+                TranslationAnimation -> MoveCursorAnimator(this)
+                ScaleAnimation -> ScaleCursorAnimator(this)
+                FadeAnimation -> FadeCursorAnimator(this)
+            }
+
+            isWordwrap = globalConfig.isWordWrapEnabled()
         }
 
-        editorViewModel.plugin!!.pluginMain.setAutoCompletionEnabled(
-            GlobalConfig.getInstance().isAutoCompletionEnabled()
-        )
         editorViewModel.plugin!!.pluginMain.apply {
             onOpenProject(
                 this@EditorActivity,
@@ -593,7 +622,6 @@ class EditorActivity : BaseActivity(), FileSelectorAdapter.FileSelectorCallback 
                     editorViewModel.plugin!!.pluginMain.onOpenFile(
                         this@EditorActivity, file, editor
                     )
-                    editor.setEditorLanguage(PhpLanguage())
                 }
             } finally {
                 openFileCoroutineLock.unlock()

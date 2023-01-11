@@ -19,7 +19,9 @@ import com.mucheng.web.devops.databinding.ActivityAboutBinding
 import com.mucheng.web.devops.dialog.PrivacyPolicyDialog
 import com.mucheng.web.devops.dialog.ThanksDialog
 import com.mucheng.web.devops.openapi.util.ContextUtil.openBrowser
+import com.mucheng.web.devops.support.LanguageKeys
 import com.mucheng.web.devops.ui.adapter.AboutAdapter
+import com.mucheng.web.devops.util.supportedText
 import es.dmoral.toasty.Toasty
 
 @Suppress("SpellCheckingInspection")
@@ -40,13 +42,10 @@ class AboutActivity : BaseActivity(), AboutAdapter.AboutItemCallback {
         private const val LIB_APPCOMPAT = "AppCompat"
         private const val LIB_MATERIAL = "Material2"
         private const val LIB_TOASTY = "Toasty v1.5.2"
-        private const val LIB_MU_CODE_EDITOR = "MuCodeEditor v1.2.1.5"
-        private const val LIB_TEXT_MODEL = "TextModel"
-        private const val LIB_RXJAVA = "RxJava v2.1.1"
-        private const val LIB_LEAN_CLOUD = "LeanCloud v8.2.10"
         private const val LIB_SWIPE_REFRESH_LAYOUT = "SwipeRefreshLayout v1.1.0"
         private const val LIB_PERMISSION_X = "PermissionX v1.6.4"
-        private const val COPYRIGHT = "2022 Mu Team All rights reserved."
+        private const val LIB_SORA_EDITOR = "Sora-editor v0.20.4"
+        private const val COPYRIGHT = "2022 MuCheng Team All rights reserved."
     }
 
     private lateinit var viewBinding: ActivityAboutBinding
@@ -96,7 +95,7 @@ class AboutActivity : BaseActivity(), AboutAdapter.AboutItemCallback {
 
     private fun requireAboutItemList(): List<AboutItem> {
         return listOf(
-            TitleAboutItem("关于软件"),
+            TitleAboutItem(supportedText(LanguageKeys.AboutApp)),
             ClickableAboutItem(R.drawable.ic_topic_discussion, TOPIC_DISCUSSION),
             ClickableAboutItem(R.drawable.ic_web_page, WEB_PAGE),
             ClickableAboutItem(R.drawable.ic_every_user, DEVELOPER),
@@ -104,22 +103,19 @@ class AboutActivity : BaseActivity(), AboutAdapter.AboutItemCallback {
             ClickableAboutItem(R.drawable.ic_hands, THANKS),
             ClickableAboutItem(R.drawable.ic_thumbs_up, SPONSOR),
 
-            TitleAboutItem("合作伙伴"),
+            TitleAboutItem(supportedText(LanguageKeys.Friends)),
             ClickableAboutItem(R.mipmap.zhuanzhuciyuantubiao, RELATION_ZHUAN_ZHU_CI_YUAN, false),
 
-            TitleAboutItem("依赖使用"),
+            TitleAboutItem(supportedText(LanguageKeys.DependenceUse)),
             ClickableAboutItem(R.drawable.ic_android, LIB_KTX),
             ClickableAboutItem(R.drawable.ic_android, LIB_APPCOMPAT),
             ClickableAboutItem(R.drawable.ic_android, LIB_MATERIAL),
             ClickableAboutItem(R.mipmap.toasty, LIB_TOASTY, false),
-            ClickableAboutItem(R.drawable.ic_write, LIB_MU_CODE_EDITOR),
-            ClickableAboutItem(R.drawable.ic_cube_three, LIB_TEXT_MODEL),
-            ClickableAboutItem(R.drawable.ic_connection_point, LIB_RXJAVA),
-            ClickableAboutItem(R.mipmap.leancloud, LIB_LEAN_CLOUD, false),
             ClickableAboutItem(R.drawable.ic_loading_four, LIB_SWIPE_REFRESH_LAYOUT),
             ClickableAboutItem(R.drawable.ic_permissions, LIB_PERMISSION_X),
+            ClickableAboutItem(R.drawable.ic_write, LIB_SORA_EDITOR),
 
-            TitleAboutItem("版权"),
+            TitleAboutItem(supportedText(LanguageKeys.Copyright)),
             ClickableAboutItem(R.drawable.ic_copyright, COPYRIGHT)
         )
     }
@@ -140,12 +136,9 @@ class AboutActivity : BaseActivity(), AboutAdapter.AboutItemCallback {
             LIB_APPCOMPAT -> openBrowser("https://developer.android.google.cn/jetpack/androidx/releases/appcompat?hl=zh_cn")
             LIB_MATERIAL -> openBrowser("https://developer.android.google.cn/guide/topics/ui/look-and-feel?hl=zh_cn")
             LIB_TOASTY -> openBrowser("https://github.com/GrenderG/Toasty")
-            LIB_MU_CODE_EDITOR -> openBrowser("https://github.com/CaiMuCheng/MuCodeEditor")
-            LIB_TEXT_MODEL -> openBrowser("https://github.com/CaiMuCheng/TextModel")
-            LIB_RXJAVA -> openBrowser("https://github.com/ReactiveX/RxJava")
-            LIB_LEAN_CLOUD -> openBrowser("https://www.leancloud.cn/")
             LIB_SWIPE_REFRESH_LAYOUT -> openBrowser("https://developer.android.google.cn/jetpack/androidx/releases/swiperefreshlayout?hl=zh_cn")
             LIB_PERMISSION_X -> openBrowser("https://github.com/guolindev/PermissionX")
+            LIB_SORA_EDITOR -> openBrowser("https://github.com/Rosemoe/sora-editor")
         }
     }
 

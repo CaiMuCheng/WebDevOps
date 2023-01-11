@@ -18,7 +18,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:singleLine="true"
-            android:text="关于"
+            android:text="@string/about"
             android:textColor="?attr/colorOnSurface"
             android:textSize="18sp"
             tools:ignore="HardcodedText" />
@@ -50,7 +50,7 @@
                 android:layout_height="wrap_content"
                 android:layout_gravity="center_horizontal"
                 android:layout_marginTop="30dp"
-                android:text="网站开发工具 - WebDevOps"
+                android:text="@string/app_description"
                 android:textColor="?attr/colorOnSurface"
                 android:textSize="16sp"
                 tools:ignore="HardcodedText" />

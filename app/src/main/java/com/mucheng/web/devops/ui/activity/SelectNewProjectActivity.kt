@@ -11,16 +11,14 @@ import com.mucheng.web.devops.databinding.ActivitySelectNewProjectBinding
 import com.mucheng.web.devops.manager.PluginManager
 import com.mucheng.web.devops.openapi.view.LoadingComponent
 import com.mucheng.web.devops.plugin.Plugin
+import com.mucheng.web.devops.support.LanguageKeys
 import com.mucheng.web.devops.ui.adapter.SelectNewProjectAdapter
 import com.mucheng.web.devops.ui.view.CreateInfoDialog
+import com.mucheng.web.devops.util.supportedText
 import com.mucheng.webops.plugin.data.CreateInfo
 import com.mucheng.webops.plugin.data.Project
-import kotlinx.coroutines.CancellationException
-import kotlinx.coroutines.CoroutineName
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
+import kotlinx.coroutines.*
 import kotlinx.coroutines.sync.Mutex
-import kotlinx.coroutines.withContext
 
 class SelectNewProjectActivity : BaseActivity(),
     SelectNewProjectAdapter.OnSelectNewProjectListener {
@@ -92,10 +90,10 @@ class SelectNewProjectActivity : BaseActivity(),
                     e.printStackTrace()
                     withContext(Dispatchers.Main) {
                         MaterialAlertDialogBuilder(this@SelectNewProjectActivity)
-                            .setTitle("无法加载插件 ${plugin.pluginName}")
-                            .setMessage("异常: ${e.stackTraceToString()}")
+                            .setTitle("${supportedText(LanguageKeys.CannotLoadPlugin)} ${plugin.pluginName}")
+                            .setMessage("${supportedText(LanguageKeys.Exception)}: ${e.stackTraceToString()}")
                             .setCancelable(false)
-                            .setPositiveButton("确定", null)
+                            .setPositiveButton(supportedText(LanguageKeys.PermissionRequestOK), null)
                             .show()
                     }
                 }
@@ -118,10 +116,9 @@ class SelectNewProjectActivity : BaseActivity(),
         return super.onOptionsItemSelected(item)
     }
 
-
     override fun onSelectNewProject(view: View, project: Project, position: Int) {
         val loadingComponent = LoadingComponent(this)
-        loadingComponent.setContent("添加创建信息....")
+        loadingComponent.setContent(supportedText(LanguageKeys.AddCreationInfo))
         loadingComponent.show()
 
         mainScope.launch(CoroutineName("AddCreateInfo")) {
@@ -147,10 +144,10 @@ class SelectNewProjectActivity : BaseActivity(),
         }
 
         CreateInfoDialog(this)
-            .setTitle("创建/${project.name}")
+            .setTitle("${supportedText(LanguageKeys.Create)}/${project.name}")
             .setCreateInfo(createInfo)
             .setCancelable(false)
-            .setNeutralButton("取消", null)
+            .setNeutralButton(supportedText(LanguageKeys.Cancel), null)
             .show()
 
         loadingComponent.dismiss()

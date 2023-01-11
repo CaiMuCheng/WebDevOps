@@ -54,7 +54,7 @@ class MainActivity : BaseActivity() {
         }
 
         PrivacyPolicyDialog(this)
-            .setNeutralButton("拒绝") { _, _ ->
+            .setNeutralButton(supportedText(LanguageKeys.Disagree)) { _, _ ->
                 finish()
             }.require()
 

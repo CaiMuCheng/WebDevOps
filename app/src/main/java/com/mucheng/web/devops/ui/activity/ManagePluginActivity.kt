@@ -190,6 +190,7 @@ class ManagePluginActivity : BaseActivity(), ManagePluginAdapter.ManagePluginCal
                     managePluginAdapter.notifyItemInserted(length)
                 }
             } catchAllWithUnit {
+                FileUtil.deleteFile(outputFile)
                 withContext(Dispatchers.Main) {
                     it.printStackTrace()
                     Toasty.error(this@ManagePluginActivity, "加载插件失败: ${it.message}").show()

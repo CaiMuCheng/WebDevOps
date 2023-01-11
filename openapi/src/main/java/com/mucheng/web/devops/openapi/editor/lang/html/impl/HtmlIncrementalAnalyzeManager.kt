@@ -137,8 +137,8 @@ class HtmlIncrementalAnalyzeManager : AsyncIncrementalAnalyzeManager<HtmlState, 
     private fun tokenizeNormal(text: CharSequence, offset: Int, tokens: MutableList<Long>): Int {
         val tokenizer = obtainTokenizer()
         tokenizer.inputStream = CharStreams.fromString(text.substring(offset, text.length))
-        var token: Token
 
+        var token: Token
         var state = STATE_NORMAL
         while (tokenizer.nextToken().also { token = it }.type != HTMLLexer.EOF) {
             if (token.type == HTMLLexer.HTML_COMMENT_OPEN) {

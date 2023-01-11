@@ -1,133 +1,132 @@
 <?xml version="1.0" encoding="utf-8"?>
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    tools:context=".ui.activity.EditorActivity">
+                                                   xmlns:app="http://schemas.android.com/apk/res-auto"
+                                                   xmlns:tools="http://schemas.android.com/tools"
+                                                   android:layout_width="match_parent"
+                                                   android:layout_height="match_parent"
+                                                   tools:context=".ui.activity.EditorActivity">
 
     <androidx.drawerlayout.widget.DrawerLayout
-        android:id="@+id/drawerLayout"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent">
-
-        <androidx.appcompat.widget.LinearLayoutCompat
+            android:id="@+id/drawerLayout"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:orientation="vertical">
-
-            <com.google.android.material.appbar.MaterialToolbar
-                android:id="@+id/toolbar"
-                android:layout_width="match_parent"
-                android:layout_height="?attr/actionBarSize"
-                android:background="@android:color/transparent"
-                app:navigationIcon="@drawable/ic_menu"
-                app:navigationIconTint="?attr/colorOnSurface">
-
-                <com.google.android.material.textview.MaterialTextView
-                    android:id="@+id/title"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:singleLine="true"
-                    android:textColor="?attr/colorOnSurface"
-                    android:textSize="18sp" />
-
-            </com.google.android.material.appbar.MaterialToolbar>
-
-            <com.google.android.material.tabs.TabLayout
-                android:id="@+id/tab_layout"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:focusableInTouchMode="false"
-                android:visibility="gone"
-                app:tabGravity="fill"
-                app:tabMode="scrollable"
-                app:tabTextAppearance="@android:style/TextAppearance.Widget.TabWidget" />
-
-            <com.google.android.material.progressindicator.LinearProgressIndicator
-                android:id="@+id/indicator"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:progress="0"
-                android:max="100" />
-
-            <androidx.appcompat.widget.LinearLayoutCompat
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:orientation="vertical"
-                app:layout_constraintBottom_toTopOf="@+id/symbolTable"
-                app:layout_constraintTop_toTopOf="parent">
-
-                <io.github.rosemoe.sora.widget.CodeEditor
-                    android:id="@+id/editor"
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent" />
-
-                <HorizontalScrollView
-                    android:layout_width="match_parent"
-                    android:layout_height="40dp"
-                    android:layout_marginTop="-40dp">
-
-                    <io.github.rosemoe.sora.widget.SymbolInputView
-                        android:id="@+id/symbolTable"
-                        android:layout_width="wrap_content"
-                        android:layout_height="40dp" />
-
-                </HorizontalScrollView>
-
-            </androidx.appcompat.widget.LinearLayoutCompat>
-
-        </androidx.appcompat.widget.LinearLayoutCompat>
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent">
 
         <androidx.appcompat.widget.LinearLayoutCompat
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:layout_gravity="start"
-            android:background="?attr/colorSurface"
-            android:clickable="true"
-            android:focusable="true"
-            android:orientation="vertical"
-            app:cardCornerRadius="0dp">
-
-            <androidx.appcompat.widget.LinearLayoutCompat
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:orientation="vertical">
 
-                <com.google.android.material.appbar.MaterialToolbar
-                    android:id="@+id/drawerToolbar"
+            <com.google.android.material.appbar.MaterialToolbar
+                    android:id="@+id/toolbar"
                     android:layout_width="match_parent"
                     android:layout_height="?attr/actionBarSize"
                     android:background="@android:color/transparent"
-                    app:menu="@menu/menu_activity_editor_drawer"
-                    app:navigationIcon="@drawable/ic_up"
+                    app:navigationIcon="@drawable/ic_menu"
                     app:navigationIconTint="?attr/colorOnSurface">
 
-                    <com.google.android.material.textview.MaterialTextView
-                        android:id="@+id/drawerTitle"
+                <com.google.android.material.textview.MaterialTextView
+                        android:id="@+id/title"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:layout_gravity="start|center"
                         android:singleLine="true"
                         android:textColor="?attr/colorOnSurface"
-                        android:textSize="18sp" />
+                        android:textSize="18sp"/>
+
+            </com.google.android.material.appbar.MaterialToolbar>
+
+            <com.google.android.material.tabs.TabLayout
+                    android:id="@+id/tab_layout"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:focusableInTouchMode="false"
+                    android:visibility="gone"
+                    app:tabGravity="fill"
+                    app:tabMode="scrollable"
+                    app:tabTextAppearance="@android:style/TextAppearance.Widget.TabWidget"/>
+
+            <com.google.android.material.progressindicator.LinearProgressIndicator
+                    android:id="@+id/indicator"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:progress="0"
+                    android:max="100"/>
+
+            <RelativeLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent">
+
+                <HorizontalScrollView
+                        android:layout_width="match_parent"
+                        android:layout_height="40dp"
+                        android:layout_alignParentBottom="true"
+                        android:id="@+id/symbolTableContainer">
+
+                    <io.github.rosemoe.sora.widget.SymbolInputView
+                            android:id="@+id/symbolTable"
+                            android:layout_width="wrap_content"
+                            android:layout_height="40dp"/>
+
+                </HorizontalScrollView>
+
+                <io.github.rosemoe.sora.widget.CodeEditor
+                        android:id="@+id/editor"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:layout_above="@+id/symbolTableContainer"/>
+
+            </RelativeLayout>
+
+        </androidx.appcompat.widget.LinearLayoutCompat>
+
+        <androidx.appcompat.widget.LinearLayoutCompat
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_gravity="start"
+                android:background="?attr/colorSurface"
+                android:clickable="true"
+                android:focusable="true"
+                android:orientation="vertical"
+                app:cardCornerRadius="0dp">
+
+            <androidx.appcompat.widget.LinearLayoutCompat
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:orientation="vertical">
+
+                <com.google.android.material.appbar.MaterialToolbar
+                        android:id="@+id/drawerToolbar"
+                        android:layout_width="match_parent"
+                        android:layout_height="?attr/actionBarSize"
+                        android:background="@android:color/transparent"
+                        app:menu="@menu/menu_activity_editor_drawer"
+                        app:navigationIcon="@drawable/ic_up"
+                        app:navigationIconTint="?attr/colorOnSurface">
+
+                    <com.google.android.material.textview.MaterialTextView
+                            android:id="@+id/drawerTitle"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_gravity="start|center"
+                            android:singleLine="true"
+                            android:textColor="?attr/colorOnSurface"
+                            android:textSize="18sp"/>
 
                 </com.google.android.material.appbar.MaterialToolbar>
 
                 <androidx.swiperefreshlayout.widget.SwipeRefreshLayout
-                    android:id="@+id/swipeRefreshLayout"
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent">
+                        android:id="@+id/swipeRefreshLayout"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent">
 
                     <androidx.recyclerview.widget.RecyclerView
-                        android:id="@+id/fileRecyclerView"
-                        android:layout_width="match_parent"
-                        android:layout_height="match_parent"
-                        android:overScrollMode="never" />
+                            android:id="@+id/fileRecyclerView"
+                            android:layout_width="match_parent"
+                            android:layout_height="match_parent"
+                            android:overScrollMode="never"/>
 
                 </androidx.swiperefreshlayout.widget.SwipeRefreshLayout>
 

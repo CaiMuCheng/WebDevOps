@@ -1,3 +1,5 @@
 <resources>
     <string name="app_name">WebDevOps</string>
+    <string name="about">关于</string>
+    <string name="app_description">网站开发工具 - WebDevOps</string>
 </resources>

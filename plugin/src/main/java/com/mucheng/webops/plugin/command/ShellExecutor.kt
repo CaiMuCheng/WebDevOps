@@ -10,8 +10,6 @@ object ShellExecutor {
 
     private var pidField: Field? = null
 
-    private val map: MutableMap<String, Any> = HashMap()
-
     @SuppressLint("DiscouragedPrivateApi")
     @Synchronized
     fun getPid(process: Process): Int {
@@ -63,26 +61,6 @@ object ShellExecutor {
             .directory(workDir)
             .command(cmd)
             .start()
-    }
-
-    @Synchronized
-    fun addMap(key: String, value: Any) {
-        this.map[key] = value
-    }
-
-    @Synchronized
-    fun get(key: String): Any? {
-        return this.map[key]
-    }
-
-    @Suppress("ControlFlowWithEmptyBody")
-    suspend fun getSuspend(key: String): Any {
-        return withContext(Dispatchers.IO) {
-            while (get(key) == null) {
-
-            }
-            get(key)!!
-        }
     }
 
 }

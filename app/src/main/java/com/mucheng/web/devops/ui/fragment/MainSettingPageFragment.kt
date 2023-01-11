@@ -13,17 +13,14 @@ import com.google.android.material.switchmaterial.SwitchMaterial
 import com.mucheng.web.devops.base.BaseFragment
 import com.mucheng.web.devops.config.CursorAnimationType
 import com.mucheng.web.devops.config.GlobalConfig
-import com.mucheng.web.devops.config.MeasureType
-import com.mucheng.web.devops.data.model.ClickableSettingItem
-import com.mucheng.web.devops.data.model.ColorSettingItem
-import com.mucheng.web.devops.data.model.SettingItem
-import com.mucheng.web.devops.data.model.SwitchSettingItem
-import com.mucheng.web.devops.data.model.TitleSettingItem
+import com.mucheng.web.devops.data.model.*
 import com.mucheng.web.devops.databinding.FragmentMainSettingPageBinding
+import com.mucheng.web.devops.support.LanguageKeys
 import com.mucheng.web.devops.ui.activity.AboutActivity
 import com.mucheng.web.devops.ui.activity.ManagePluginActivity
 import com.mucheng.web.devops.ui.adapter.SettingAdapter
 import com.mucheng.web.devops.ui.view.ComposableDialog
+import com.mucheng.web.devops.util.supportedText
 import com.mucheng.webops.plugin.data.info.ComponentInfo
 import es.dmoral.toasty.Toasty
 import java.io.File
@@ -32,25 +29,23 @@ class MainSettingPageFragment : BaseFragment(), SettingAdapter.SettingItemCallba
 
     companion object {
 
-        private const val DarkTheme = "深色主题"
-        private const val AppTypeface = "应用字体"
+        private val DarkTheme = supportedText(LanguageKeys.DarkTheme)
+        private val AppTypeface = supportedText(LanguageKeys.AppTypeface)
 
-        private const val AutoCompletion = "自动补全"
-        private const val OperatorCompletion = "运算符补全"
-        private const val CursorVisibleAnimationEnabled = "光标显示动画"
-        private const val CursorAnimationEnabled = "光标动画"
-        private const val LineNumberEnabled = "显示行号"
-        private const val StickyLineNumberEnabled = "粘性行号"
-        private const val DividingLineEnabled = "行分割线"
+        private val AutoCompletion = supportedText(LanguageKeys.AutoCompletion)
+        private val OperatorCompletion = supportedText(LanguageKeys.OperatorCompletion)
+        private val CursorAnimationEnabled = supportedText(LanguageKeys.CursorAnimationEnabled)
+        private val LineNumberEnabled = supportedText(LanguageKeys.LineNumberEnabled)
+        private val WordWrapEnabled = supportedText(LanguageKeys.WordWrapEnabled)
+        private val StickyLineNumberEnabled = supportedText(LanguageKeys.StickyLineNumberEnabled)
         // Switch title end
 
-        private const val CursorAnimation = "光标动画"
-        private const val MeasureMode = "测量模式"
-        private const val OperatorInputCharTable = "运算符插入栏"
-        private const val EditorTypeface = "代码编辑器字体"
+        private val CursorAnimation = supportedText(LanguageKeys.CursorAnimation)
+        private val OperatorInputCharTable = supportedText(LanguageKeys.OperatorInputCharTable)
+        private val EditorTypeface = supportedText(LanguageKeys.EditorTypeface)
 
-        private const val ManagePlugin = "插件管理"
-        private const val AboutAPP = "关于软件"
+        private val ManagePlugin = supportedText(LanguageKeys.ManagePlugin)
+        private val AboutAPP = supportedText(LanguageKeys.AboutAPP)
     }
 
     private lateinit var viewBinding: FragmentMainSettingPageBinding
@@ -88,22 +83,17 @@ class MainSettingPageFragment : BaseFragment(), SettingAdapter.SettingItemCallba
             listOf(
                 TitleSettingItem("通用"),
                 SwitchSettingItem(DarkTheme, "启用深色主题", GlobalConfig.isDarkThemeEnabled()),
-                /*ClickableSettingItem(AppTypeface, "应用的全局字体"),*/
+                ClickableSettingItem(AppTypeface, "应用的全局字体"),
                 TitleSettingItem("代码编辑器"),
                 SwitchSettingItem(
                     AutoCompletion,
                     "通过自动补全栏补全代码",
                     globalConfig.isAutoCompletionEnabled()
                 ),
-                /*SwitchSettingItem(
+                SwitchSettingItem(
                     OperatorCompletion,
                     "通过运算符补全栏补全代码",
                     globalConfig.isOperatorPanelEnabled()
-                ),
-                SwitchSettingItem(
-                    CursorVisibleAnimationEnabled,
-                    "光标闪烁动画",
-                    globalConfig.isCursorVisibleAnimationEnabled()
                 ),
                 SwitchSettingItem(
                     CursorAnimationEnabled,
@@ -116,28 +106,24 @@ class MainSettingPageFragment : BaseFragment(), SettingAdapter.SettingItemCallba
                     globalConfig.isLineNumberEnabled()
                 ),
                 SwitchSettingItem(
+                    WordWrapEnabled,
+                    "自动换行",
+                    globalConfig.isLineNumberEnabled()
+                ),
+                SwitchSettingItem(
                     StickyLineNumberEnabled,
                     "行号总是置于上层",
                     globalConfig.isStickyLineNumberEnabled()
-                ),
-                SwitchSettingItem(
-                    DividingLineEnabled,
-                    "行分割线",
-                    globalConfig.isDividingLineEnabled()
                 ),
                 ClickableSettingItem(
                     CursorAnimation,
                     getCursorAnimationDescription(globalConfig.getCursorAnimationType())
                 ),
                 ClickableSettingItem(
-                    MeasureMode,
-                    getMeasureTypeDescription(globalConfig.getMeasureType())
-                ),*/
-                ClickableSettingItem(
                     OperatorInputCharTable,
                     globalConfig.getOperatorInputCharTable().joinToString(separator = " ")
                 ),
-                //ClickableSettingItem(EditorTypeface, "编辑器文本字体"),
+                ClickableSettingItem(EditorTypeface, "编辑器文本字体"),
                 TitleSettingItem("其它"),
                 ClickableSettingItem(ManagePlugin, "删除或配置插件"),
                 ClickableSettingItem(AboutAPP, "关于此软件的信息")
@@ -154,27 +140,11 @@ class MainSettingPageFragment : BaseFragment(), SettingAdapter.SettingItemCallba
         }
     }
 
-    private fun getMeasureTypeDescription(measureType: MeasureType): String {
-        return if (measureType == MeasureType.LineRowVisible) {
-            "LineRowVisible"
-        } else {
-            "LineVisible"
-        }
-    }
-
     private fun getCursorAnimationTypeByDescription(type: String): CursorAnimationType {
         return when (type) {
             "缩放动画" -> CursorAnimationType.ScaleAnimation
             "透明动画" -> CursorAnimationType.FadeAnimation
             else -> CursorAnimationType.TranslationAnimation
-        }
-    }
-
-    private fun getMeasureTypeByDescription(text: String): MeasureType {
-        return if (text == "LineRowVisible") {
-            MeasureType.LineRowVisible
-        } else {
-            MeasureType.LineVisible
         }
     }
 
@@ -258,36 +228,6 @@ class MainSettingPageFragment : BaseFragment(), SettingAdapter.SettingItemCallba
                         val text = items[selectedPosition]
                         val type = getCursorAnimationTypeByDescription(text)
                         globalConfig.setCursorAnimationType(type)
-                        globalConfig.apply()
-                        settingItem.description = text
-                        settingAdapter.notifyItemChanged(position)
-                        true
-                    }
-                    .setCancelable(true)
-                    .setNeutralButton("取消", null)
-                    .setPositiveButton("确定", null)
-                    .show()
-            }
-
-            MeasureMode -> {
-                val array = arrayOf("LineRowVisible", "LineVisible")
-                ComposableDialog(requireContext())
-                    .setTitle("选择测量模式")
-                    .setComponents(
-                        listOf(
-                            ComponentInfo.SelectorInfo(
-                                array,
-                                array.indexOf(settingItem.description)
-                            )
-                        )
-                    )
-                    .onComplete {
-                        val selectorInfo = it[0] as ComponentInfo.SelectorInfo
-                        val items = selectorInfo.items
-                        val selectedPosition = selectorInfo.position
-                        val text = items[selectedPosition]
-                        val type = getMeasureTypeByDescription(text)
-                        globalConfig.setMeasureType(type)
                         globalConfig.apply()
                         settingItem.description = text
                         settingAdapter.notifyItemChanged(position)
@@ -428,11 +368,6 @@ class MainSettingPageFragment : BaseFragment(), SettingAdapter.SettingItemCallba
                 globalConfig.apply()
             }
 
-            CursorVisibleAnimationEnabled -> {
-                globalConfig.setCursorVisibleAnimationEnabled(isChecked)
-                globalConfig.apply()
-            }
-
             CursorAnimationEnabled -> {
                 globalConfig.setCursorAnimationEnabled(isChecked)
                 globalConfig.apply()
@@ -443,13 +378,13 @@ class MainSettingPageFragment : BaseFragment(), SettingAdapter.SettingItemCallba
                 globalConfig.apply()
             }
 
-            StickyLineNumberEnabled -> {
-                globalConfig.setStickyLineNumberEnabled(isChecked)
+            WordWrapEnabled -> {
+                globalConfig.setWordWrapEnabled(isChecked)
                 globalConfig.apply()
             }
 
-            DividingLineEnabled -> {
-                globalConfig.setDividingLineEnabled(isChecked)
+            StickyLineNumberEnabled -> {
+                globalConfig.setStickyLineNumberEnabled(isChecked)
                 globalConfig.apply()
             }
         }

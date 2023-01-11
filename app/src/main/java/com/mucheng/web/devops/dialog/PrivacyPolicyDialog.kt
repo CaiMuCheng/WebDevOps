@@ -6,15 +6,17 @@ import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.edit
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
+import com.mucheng.web.devops.support.LanguageKeys
+import com.mucheng.web.devops.util.supportedText
 
 class PrivacyPolicyDialog(private val activity: AppCompatActivity) :
     MaterialAlertDialogBuilder(activity) {
 
     init {
-        setTitle("隐私政策")
+        setTitle(supportedText(LanguageKeys.PrivacyPolicy))
         setMessage(activity.assets.open("protocol/Privacy-policy.txt").bufferedReader().readText())
         setCancelable(false)
-        setPositiveButton("同意", null)
+        setPositiveButton(supportedText(LanguageKeys.Agree), null)
     }
 
     override fun setNegativeButton(

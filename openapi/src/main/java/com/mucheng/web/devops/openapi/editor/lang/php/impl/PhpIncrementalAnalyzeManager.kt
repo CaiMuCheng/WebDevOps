@@ -1,12 +1,15 @@
 package com.mucheng.web.devops.openapi.editor.lang.php.impl
 
+import android.util.Log
 import com.mucheng.web.devops.openapi.editor.lang.php.PhpLexer
 import com.mucheng.web.devops.openapi.editor.lang.php.PhpLexer.*
 import com.mucheng.web.devops.openapi.editor.lang.php.impl.PhpState.Companion.STATE_INCOMPLETE_HTML_COMMENT
 import com.mucheng.web.devops.openapi.editor.lang.php.impl.PhpState.Companion.STATE_INCOMPLETE_PHP
+import com.mucheng.web.devops.openapi.editor.lang.php.impl.PhpState.Companion.STATE_INCOMPLETE_PHP_COMMENT
 import com.mucheng.web.devops.openapi.editor.lang.php.impl.PhpState.Companion.STATE_NORMAL
 import io.github.rosemoe.sora.lang.analysis.AsyncIncrementalAnalyzeManager
 import io.github.rosemoe.sora.lang.analysis.IncrementalAnalyzeManager
+import io.github.rosemoe.sora.lang.completion.IdentifierAutoComplete.SyncIdentifiers
 import io.github.rosemoe.sora.lang.styling.CodeBlock
 import io.github.rosemoe.sora.lang.styling.Span
 import io.github.rosemoe.sora.lang.styling.TextStyle
@@ -21,33 +24,186 @@ class PhpIncrementalAnalyzeManager : AsyncIncrementalAnalyzeManager<PhpState, Lo
 
     private val tokenizerProvider = ThreadLocal<PhpLexer>()
 
+    private val identifiers = SyncIdentifiers()
+
     companion object {
         private fun pack(type: Int, column: Int): Long {
             return IntPair.pack(type, column)
         }
 
-        private const val COMPLETE = 129
+        private const val INCOMPLETE_HTML_COMMENT = 237
 
-        private const val INCOMPLETE = 130
+        private const val COMPLETE_HTML_COMMENT = 238
+
+        private const val INCOMPLETE_PHP_COMMENT = 239
+
+        private const val COMPLETE_PHP_COMMENT = 240
+
+        private const val INCOMPLETE_PHP_OPEN = 241
+
+        private const val INCOMPLETE_PHP_CLOSE = 242
 
     }
 
     @Synchronized
     private fun obtainTokenizer(): PhpLexer {
-        var res = tokenizerProvider.get()
-        if (res == null) {
-            res = PhpLexer(CharStreams.fromString(""))
-            tokenizerProvider.set(res)
+        var tokenizer = tokenizerProvider.get()
+        if (tokenizer == null) {
+            tokenizer = PhpLexer(CharStreams.fromString(""))
         }
-        return res
+        tokenizerProvider.set(tokenizer)
+        return tokenizer
     }
 
     override fun getInitialState(): PhpState {
         return PhpState()
     }
 
-    override fun computeBlocks(text: Content?, delegate: CodeBlockAnalyzeDelegate?): MutableList<CodeBlock> {
-        return ArrayList(0)
+    override fun stateEquals(state: PhpState, another: PhpState): Boolean {
+        return state == another
+    }
+
+    override fun tokenizeLine(
+        line: CharSequence,
+        state: PhpState,
+        lineIndex: Int
+    ): IncrementalAnalyzeManager.LineTokenizeResult<PhpState, Long> {
+        val tokens = ArrayList<Long>()
+        val stateObj = PhpState()
+        var newState = STATE_NORMAL
+
+        when (state.state) {
+            STATE_NORMAL -> {
+                newState = tokenizeNormal(line, 0, tokens)
+            }
+
+            STATE_INCOMPLETE_HTML_COMMENT -> {
+                newState = tokenizeHtmlComment(line, tokens)
+            }
+
+            STATE_INCOMPLETE_PHP -> {
+                newState = tokenizePhp(line, 0, tokens)
+            }
+
+            STATE_INCOMPLETE_PHP_COMMENT -> {
+                newState = tokenizePhpComment(line, tokens)
+            }
+        }
+
+        stateObj.state = newState
+        if (tokens.isEmpty()) {
+            tokens.add(pack(EOF, 0))
+        }
+        return IncrementalAnalyzeManager.LineTokenizeResult(stateObj, tokens)
+    }
+
+    private fun tokenizeNormal(text: CharSequence, offset: Int, tokens: MutableList<Long>): Int {
+        val tokenizer = obtainTokenizer()
+        tokenizer.inputStream = CharStreams.fromString(text.substring(offset, text.length))
+
+        var token: Token
+        var state = STATE_NORMAL
+        while (tokenizer.nextToken().also { token = it }.type != EOF) {
+            if (token.type == HtmlCommentOpen) {
+                state = STATE_INCOMPLETE_HTML_COMMENT
+                tokens.add(
+                    pack(
+                        INCOMPLETE_HTML_COMMENT,
+                        token.charPositionInLine + offset
+                    )
+                )
+                break
+            }
+            if (token.type == PHPStart) {
+                tokens.add(
+                    pack(
+                        INCOMPLETE_PHP_OPEN,
+                        token.charPositionInLine + offset
+                    )
+                )
+                return tokenizePhp(text, token.stopIndex + 1 + offset, tokens)
+            }
+            tokens.add(pack(token.type, token.charPositionInLine + offset))
+        }
+        return state
+    }
+
+    private fun tokenizeHtmlComment(text: CharSequence, tokens: MutableList<Long>): Int {
+        val state = STATE_INCOMPLETE_HTML_COMMENT
+        val suffix = "-->"
+        val endIndex = text.indexOf(suffix, 0)
+        if (endIndex >= 0) {
+            tokens.add(pack(INCOMPLETE_HTML_COMMENT, 0))
+            return tokenizeNormal(text, endIndex + suffix.length, tokens)
+        } else {
+            tokens.add(pack(INCOMPLETE_HTML_COMMENT, 0))
+        }
+        return state
+    }
+
+    private fun tokenizePhp(text: CharSequence, offset: Int, tokens: MutableList<Long>): Int {
+        var state = STATE_INCOMPLETE_PHP
+        val suffix = "?>"
+        val endIndex = text.indexOf(suffix, offset)
+        if (endIndex >= 0) {
+            val tokenizer = obtainTokenizer()
+            tokenizer.inputStream = CharStreams.fromString(text.substring(offset, endIndex))
+            tokenizer.mode(PHP)
+
+            var token: Token
+            while (tokenizer.nextToken().also { token = it }.type != EOF) {
+                if (token.type == MultiLineCommentOpen) {
+                    tokens.add(
+                        pack(
+                            INCOMPLETE_PHP_COMMENT,
+                            token.charPositionInLine + offset
+                        )
+                    )
+                    break
+                }
+                Log.e("Content", """
+                    type: ${token.type}
+                    text: $text
+                """.trimIndent())
+                tokens.add(pack(token.type, token.charPositionInLine + offset))
+            }
+
+            tokens.add(pack(INCOMPLETE_PHP_CLOSE, endIndex))
+            return tokenizeNormal(text, endIndex + suffix.length, tokens)
+        } else {
+            val tokenizer = obtainTokenizer()
+            tokenizer.inputStream = CharStreams.fromString(text.substring(offset, text.length))
+            tokenizer.mode(PHP)
+
+            var token: Token
+            while (tokenizer.nextToken().also { token = it }.type != EOF) {
+                if (token.type == MultiLineCommentOpen) {
+                    state = STATE_INCOMPLETE_PHP_COMMENT
+                    tokens.add(
+                        pack(
+                            INCOMPLETE_PHP_COMMENT,
+                            token.charPositionInLine + offset
+                        )
+                    )
+                    break
+                }
+                tokens.add(pack(token.type, token.charPositionInLine + offset))
+            }
+        }
+        return state
+    }
+
+    private fun tokenizePhpComment(text: CharSequence, tokens: MutableList<Long>): Int {
+        val state = STATE_INCOMPLETE_PHP_COMMENT
+        val suffix = "*/"
+        val endIndex = text.indexOf(suffix, 0)
+        if (endIndex >= 0) {
+            tokens.add(pack(INCOMPLETE_PHP_COMMENT, 0))
+            return tokenizePhp(text, endIndex + suffix.length, tokens)
+        } else {
+            tokens.add(pack(INCOMPLETE_PHP_COMMENT, 0))
+        }
+        return state
     }
 
     override fun generateSpansForLine(lineResult: IncrementalAnalyzeManager.LineTokenizeResult<PhpState, Long>): MutableList<Span> {
@@ -61,7 +217,7 @@ class PhpIncrementalAnalyzeManager : AsyncIncrementalAnalyzeManager<PhpState, Lo
 
             when (type) {
 
-                XmlStart, XML, XmlClose, HtmlDtd -> {
+                XmlStart, XML, XmlClose, HtmlDtd, INCOMPLETE_PHP_OPEN, INCOMPLETE_PHP_CLOSE -> {
                     spans.add(
                         Span.obtain(
                             column,
@@ -191,8 +347,10 @@ class PhpIncrementalAnalyzeManager : AsyncIncrementalAnalyzeManager<PhpState, Lo
 
 
                 HtmlCommentOpen, CommentEnd,
-                MultiLineComment, SingleLineComment,
-                HtmlComment -> {
+                MultiLineComment, HtmlComment,
+                INCOMPLETE_HTML_COMMENT, INCOMPLETE_PHP_COMMENT,
+                SingleLineComment, ShellStyleComment,
+                Comment, Shebang-> {
                     spans.add(
                         Span.obtain(
                             column,
@@ -229,112 +387,7 @@ class PhpIncrementalAnalyzeManager : AsyncIncrementalAnalyzeManager<PhpState, Lo
         return spans
     }
 
-    override fun tokenizeLine(
-        line: CharSequence,
-        state: PhpState,
-        lineIndex: Int
-    ): IncrementalAnalyzeManager.LineTokenizeResult<PhpState, Long> {
-        val tokens = ArrayList<Long>()
-        val stateObj = PhpState()
-        var newState = STATE_NORMAL
-        if (state.state == STATE_NORMAL) {
-            newState = tokenizeNormal(line, 0, tokens)
-        } else if (state.state == STATE_INCOMPLETE_HTML_COMMENT) {
-            val result = tryFillHtmlIncompleteComment(line, tokens)
-            newState = IntPair.getFirst(result)
-            newState = if (newState == STATE_NORMAL) {
-                tokenizeNormal(line, IntPair.getSecond(result), tokens)
-            } else {
-                STATE_INCOMPLETE_HTML_COMMENT
-            }
-        } else if (state.state == STATE_INCOMPLETE_PHP) {
-            val result = tryFillPhpIncomplete(line, tokens)
-            newState = IntPair.getFirst(result)
-            newState = if (newState == STATE_NORMAL) {
-                tokenizeNormal(line, IntPair.getSecond(result), tokens)
-            } else {
-                STATE_INCOMPLETE_PHP
-            }
-        }
-        if (tokens.isEmpty()) {
-            tokens.add(pack(EOF, 0))
-        }
-        stateObj.state = newState
-        return IncrementalAnalyzeManager.LineTokenizeResult(stateObj, tokens)
+    override fun computeBlocks(text: Content?, delegate: CodeBlockAnalyzeDelegate?): MutableList<CodeBlock> {
+        return ArrayList(0)
     }
-
-    private fun tokenizeNormal(text: CharSequence, offset: Int, tokens: MutableList<Long>): Int {
-        val tokenizer = obtainTokenizer()
-        tokenizer.inputStream = CharStreams.fromString(text.substring(offset, text.length))
-        var token: Token
-
-        var state = STATE_NORMAL
-        while (tokenizer.nextToken().also { token = it }.type != EOF) {
-            if (token.type == HtmlCommentOpen) {
-                state = STATE_INCOMPLETE_HTML_COMMENT
-                tokens.add(pack(INCOMPLETE, token.charPositionInLine + offset))
-                break
-            }
-            if (token.type == PHPStart) {
-                state = STATE_INCOMPLETE_PHP
-                tokens.add(pack(INCOMPLETE, token.charPositionInLine + offset))
-                break
-            }
-            tokens.add(pack(token.type, token.charPositionInLine + offset))
-        }
-        return state
-    }
-
-    private fun tryFillHtmlIncompleteComment(text: CharSequence, tokens: MutableList<Long>): Long {
-        var index = 0
-        while (index < text.length) {
-            if (text[index] == '-') {
-                if (index + 1 < text.length && text[index + 1] == '-') {
-                    if (index + 2 < text.length && text[index + 2] == '>') {
-                        tokens.add(pack(COMPLETE, 0))
-                        return pack(STATE_NORMAL, index + 3)
-                    }
-                }
-            }
-            ++index
-        }
-
-        tokens.add(pack(INCOMPLETE, 0))
-        return pack(STATE_INCOMPLETE_HTML_COMMENT, 0)
-    }
-
-    private fun tryFillPhpIncomplete(text: CharSequence, tokens: MutableList<Long>): Long {
-        val endIndex = text.indexOf("?>")
-        if (endIndex < 0) {
-            val tokenizer = obtainTokenizer()
-            tokenizer.inputStream = CharStreams.fromString(text.toString())
-            tokenizer.mode(PHP)
-
-            var token: Token
-            while (tokenizer.nextToken().also { token = it }.type != EOF) {
-                tokens.add(pack(token.type, token.charPositionInLine))
-            }
-
-            tokens.add(pack(INCOMPLETE, 0))
-            return pack(STATE_INCOMPLETE_PHP, text.length)
-        } else {
-            val substring = text.substring(0, endIndex)
-            val tokenizer = obtainTokenizer()
-            tokenizer.inputStream = CharStreams.fromString(substring)
-            tokenizer.mode(PHP)
-
-            var token: Token
-            while (tokenizer.nextToken().also { token = it }.type != EOF) {
-                tokens.add(pack(token.type, token.charPositionInLine))
-            }
-
-            tokens.add(pack(COMPLETE, 0))
-            return pack(STATE_NORMAL, endIndex)
-        }
-    }
-
-    override fun stateEquals(state: PhpState, another: PhpState): Boolean {
-        return state == another
-    }
-
 }

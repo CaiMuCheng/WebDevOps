@@ -1,6 +1,6 @@
 # WebDevOps
 
-A Android Web IDE supports code auto-completion and highlight, plugin (Supports Html, Css, JS, Json, Xml,
+An Android Web IDE supports code auto-completion and highlight, plugin (Supports Html, Css, JS, Json, Xml,
 Php etc)
 
 ## Join us

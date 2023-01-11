@@ -1,0 +1,5 @@
+<resources>
+    <string name="app_name">WebDevOps</string>
+    <string name="about">About</string>
+    <string name="app_description">Web development tool - WebDevOps</string>
+</resources>

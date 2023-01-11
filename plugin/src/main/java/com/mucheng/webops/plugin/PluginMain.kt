@@ -10,12 +10,7 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.switchmaterial.SwitchMaterial
 import com.mucheng.web.devops.openapi.util.FileUtil
-import com.mucheng.webops.plugin.data.CreateInfo
-import com.mucheng.webops.plugin.data.Files
-import com.mucheng.webops.plugin.data.ObservableValue
-import com.mucheng.webops.plugin.data.PluginConfigItem
-import com.mucheng.webops.plugin.data.Project
-import com.mucheng.webops.plugin.data.Workspace
+import com.mucheng.webops.plugin.data.*
 import io.github.rosemoe.sora.widget.CodeEditor
 import kotlinx.coroutines.CoroutineScope
 import java.io.File
@@ -140,10 +135,6 @@ abstract class PluginMain {
         adapter: RecyclerView.Adapter<*>
     ) {
 
-    }
-
-    fun setAutoCompletionEnabled(isAutoCompletionEnabled: Boolean) {
-        this.isAutoCompletionEnabled = isAutoCompletionEnabled
     }
 
     open fun isSupportedConfig(): Boolean {

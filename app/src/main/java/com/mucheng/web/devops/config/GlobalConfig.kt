@@ -20,6 +20,7 @@ enum class ConfigKeyEnum {
     CursorVisibleAnimationEnabled,
     CursorAnimationEnabled,
     LineNumberEnabled,
+    WordWrapEnabled,
     StickyLineNumber,
     DividingLineEnabled,
     CursorAnimationType,
@@ -143,6 +144,14 @@ class GlobalConfig private constructor() : BaseBean() {
 
     fun isLineNumberEnabled(): Boolean {
         return get(ConfigKeyEnum.LineNumberEnabled)?.toBooleanStrictOrNull() ?: true
+    }
+
+    fun setWordWrapEnabled(isEnabled: Boolean) {
+        set(ConfigKeyEnum.WordWrapEnabled, isEnabled.toString())
+    }
+
+    fun isWordWrapEnabled(): Boolean {
+        return get(ConfigKeyEnum.WordWrapEnabled)?.toBooleanStrictOrNull() ?: false
     }
 
     fun setStickyLineNumberEnabled(isEnabled: Boolean) {
